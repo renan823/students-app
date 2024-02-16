@@ -11,8 +11,8 @@ export interface User {
 }
 
 export interface Lesson {
-    startAt: Date;
-    endAt: Date;
+    startAt: Date | string;
+    endAt: Date | string;
     value: number;
 }
 

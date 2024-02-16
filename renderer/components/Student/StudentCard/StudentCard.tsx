@@ -2,7 +2,7 @@ import { AlertTriangle, Check, User } from "lucide-react"
 import { useState } from "react"
 import { splitGrades, splitPhones } from "../StudentModal/actions"
 import StudentModal from "../StudentModal"
-import { toInputDate } from "../../../utils/date"
+import { toInputDate } from "../../../../utils/date"
 
 export function StudentCardIcon ({ debt }) {
     return (

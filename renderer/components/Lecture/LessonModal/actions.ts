@@ -1,7 +1,24 @@
-import { Lesson, User } from "../../intefaces";
+import { sendEvent } from "../../../../utils/api";
+import { Lesson, User } from "../../../intefaces";
 
-export function addLesson (lesson: Lesson, student: User) {
+export async function addLesson (lesson: Lesson, student: User) {
+    const user_cpf = student.cpf;
 
+    lesson.startAt = new Date(lesson.startAt).toISOString();
+    lesson.endAt = new Date(lesson.endAt).toISOString();
+
+    try {
+        const result: any = await sendEvent("create-lesson", lesson);
+        if (result) {
+            const lecture = { user_cpf, lesson_id: result.id, payed: false, presence: false };
+            await sendEvent("create-lecture", lecture);
+
+            return true;
+        }
+    } catch (error) {
+        console.log(error)
+        return false;
+    }
 }
 
 /**

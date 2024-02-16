@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
-import Modal from "../Modal";
-import { Lesson } from "../../intefaces";
-import Field from "../Field";
+import Modal from "../../Modal";
+import { Lesson } from "../../../intefaces";
+import Field from "../../Field";
 import { useRef, useState } from "react";
-import { useStudentsStore } from "../../store";
+import { useStudentsStore } from "../../../store";
 import SearchStudent from "../SearchStudent";
 
 export default function LessonModal ({ isOpen, closeModal, onSave }) {

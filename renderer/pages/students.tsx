@@ -1,18 +1,18 @@
 import { Layout } from "../components/Layout";
 import { useEffect, useState } from "react";
-import StudentModal from "../components/StudentModal";
-import StudentSearch from "../components/StudentSearch/StudentSearch";
+import StudentModal from "../components/Student/StudentModal";
+import StudentSearch from "../components/Student/StudentSearch/StudentSearch";
 import { sendEvent } from "../../utils/api";
 import { toast } from "react-hot-toast";
 import Pagination from "../components/Pagination";
-import StudentCard from "../components/StudentCard/StudentCard";
+import StudentCard from "../components/Student/StudentCard/StudentCard";
+import { Plus } from "lucide-react";
 
 export default function Students () {
 
     const [loading, setLoading] = useState(true);
     const [studentsData, setStudentsData] = useState([]);
     const [isOpen, setOpen] = useState(false);
-    const [selected, setSelected] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
@@ -31,7 +31,7 @@ export default function Students () {
             try {
                 const data: any = await sendEvent("find-all-students-with-phones-and-debt");
                 setStudentsData(data);
-                setCurrentPage(1)
+                setCurrentPage(1);
             } catch (error) {
                 toast.error("Algo deu errado")
             } finally {
@@ -47,8 +47,9 @@ export default function Students () {
             <Layout.Header>
                 <StudentSearch setSearchResults={setStudentsData} selector/>
                 <div>
-                    <button className="py-2 px-4 bg-lightRed shadow-sm shadow-slate-400 rounded-sm" onClick={() => setOpen(true)}>
-                        <h2 className="font-bold text-xl text-white">Cadastrar aluno</h2>
+                <button className="py-2 px-4 flex gap-5 items-center bg-lightRed shadow-sm shadow-slate-400 rounded-sm" onClick={() => setOpen(true)}>
+                        <Plus color="white"/>
+                        <h2 className="font-bold text-xl text-white">Novo aluno</h2>
                     </button>
                     <StudentModal isOpen={isOpen} setOpen={setOpen} student={null} phones={null}/>
                 </div>

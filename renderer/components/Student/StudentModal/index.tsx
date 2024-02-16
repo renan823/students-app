@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Modal } from "../Modal";
-import { Phone, User } from "../../intefaces";
+import { Modal } from "../../Modal";
+import { Phone, User } from "../../../intefaces";
 import { useForm } from "react-hook-form";
-import Field from "../Field";
-import Select from "../Select";
-import TextArea from "../TextArea";
+import Field from "../../Field";
+import Select from "../../Select";
+import TextArea from "../../TextArea";
 import { addStudent, grades, splitPhones, updateStudent, years } from "./actions";
 import { toast } from "react-hot-toast";
 

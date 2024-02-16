@@ -1,5 +1,5 @@
-import { sendEvent } from "../../../utils/api";
-import { Phone, User } from "../../intefaces";
+import { sendEvent } from "../../../../utils/api";
+import { Phone, User } from "../../../intefaces";
 
 interface AddStudentProps {
     student: User

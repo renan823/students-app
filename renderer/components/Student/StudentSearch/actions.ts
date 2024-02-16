@@ -1,4 +1,4 @@
-import { sendEvent } from "../../../utils/api"
+import { sendEvent } from "../../../../utils/api"
 
 export async function searchStudents (type: string, searchParam: string) {
     try {

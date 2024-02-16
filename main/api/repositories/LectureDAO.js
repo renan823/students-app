@@ -97,6 +97,10 @@ class LectureDAO {
                 orderBy: {
                     created_at: "desc",
                 },
+                include: {
+                    lesson: true,
+                    user: true
+                },
                 skip,
                 take,
             });

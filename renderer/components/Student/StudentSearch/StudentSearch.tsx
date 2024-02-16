@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { searchOptions, searchStudents } from "./actions";
 import { toast } from "react-hot-toast";
-import { sendEvent } from "../../../utils/api";
+import { sendEvent } from "../../../../utils/api";
 
 interface SearchStudentsProps {
     setSearchResults: Dispatch<SetStateAction<any[]>>
