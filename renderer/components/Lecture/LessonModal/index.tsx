@@ -16,7 +16,7 @@ export default function LessonModal ({ isOpen, setOpen }) {
 
     async function onSubmit (data) {
         if (selectedStudentData) {
-            data.value = parseInt(data.value);
+            data.value = parseFloat(data.value);
             try {
                 const result = await addLesson(data, selectedStudentData.student);
                 if (result) {
@@ -48,7 +48,7 @@ export default function LessonModal ({ isOpen, setOpen }) {
                             studentsData.map((data, index) => {
                                 return (
                                     <button className="m-2 bg-slate-400 flex" onClick={() => setSelectedStudentData(data)}>
-                                        <h2 className="font-bold">{data.student.name}</h2>
+                                        <h2 key={index} className="font-bold">{data.student.name}</h2>
                                     </button>
                                 )
                             })

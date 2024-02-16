@@ -33,7 +33,7 @@ export default function Students () {
                 setStudentsData(data);
                 setCurrentPage(1);
             } catch (error) {
-                toast.error("Algo deu errado")
+                toast.error("Algo deu errado");
             } finally {
                 setLoading(false);
             }

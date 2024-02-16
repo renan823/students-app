@@ -6,45 +6,11 @@ import { Plus } from "lucide-react";
 import { sendEvent } from "../../utils/api";
 import toast from "react-hot-toast";
 import Pagination from "../components/Pagination";
+import LectureCard from "../components/Lecture/LectureCard/LectureCard";
 
 /*
-const LectureCard = ({ lecture }) => {
-    const students = useStudentsStore((state: any) => state.students);
-    const { student } = students.filter((data) => data.student.cpf === lecture.user_cpf)[0];
-
-    const lessons = useLessonsStore((state: any) => state.lessons);
-    const lesson = lessons.filter((l) => l.id === lecture.lesson_id)[0];
-
-    const setLessons = useLessonsStore((state: any) => state.setLessons)
-    const setLectures = useLecturesStore((state: any) => state.setLectures)
-
-    const onEditLecture = (data) => {
-        handleEditLecture(data, setLessons, setLectures);
-    }
-
     const [isOpen, setOpen] = useState(false);
 
-    const handlePresence = async (lecture) => {
-        try {
-            lecture.presence = !lecture.presence;
-            await sendEvent("update-lecture", lecture.id, lecture);
-            fetchData(null, null, null, setLectures);
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handlePayed = async (lecture) => {
-        try {
-            lecture.payed = !lecture.payed;
-            await sendEvent("update-lecture", lecture.id, lecture);
-            fetchData(null, null, null, setLectures);
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const data = { lecture, lesson, student };
 
     return (
         <div>
@@ -105,7 +71,6 @@ export default function Lessons () {
                 setLecturesData(data);
                 console.log(data)
                 setCurrentPage(1);
-                console.log(currentLectures);
             } catch (error) {
                 toast.error("Algo deu errado");
             } finally {
@@ -141,17 +106,17 @@ export default function Lessons () {
             <Layout.Content>
             <div className="h-full flex flex-col gap-4">
                     <h1 className="text-2xl font-bold text-slate-800 text-center">Aulas</h1>
-                    <div className="h-5/6 w-full overflow-y-auto p-2">
+                    <div className="h-5/6 w-full overflow-y-auto p-2 flex flex-col content-center">
                         {
                             currentLectures.map((lecture, index) => {
                                 return (
-                                    <h1>{lecture.user.name}</h1>
+                                    <LectureCard key={index} lecture={lecture}/>
                                 )
                             })
                         }
                     </div>
                     <div className="flex justify-center my-3">
-                    <Pagination totalData={lecturesData.length} perPage={perPage} setCurrentPage={setCurrentPage} currentPage={currentPage}/>
+                        <Pagination totalData={lecturesData.length} perPage={perPage} setCurrentPage={setCurrentPage} currentPage={currentPage}/>
                     </div>
                 </div>
             </Layout.Content>

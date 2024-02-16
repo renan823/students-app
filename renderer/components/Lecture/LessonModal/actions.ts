@@ -16,40 +16,12 @@ export async function addLesson (lesson: Lesson, student: User) {
             return true;
         }
     } catch (error) {
-        console.log(error)
         return false;
     }
 }
 
 /**
- * const handleAddLesson = async (data, setLessons, setLectures) => {
-    let { cpf, startAt, endAt, value } = data;
-
-    startAt = new Date(startAt).toISOString();
-    endAt = new Date(endAt).toISOString();
-    value = parseFloat(value);
-
-    const payed = false;
-    const presence = false;
-
-    try {
-        let lesson = null;
-        lesson = await sendEvent("create-lesson", { startAt, endAt, value }) ;
-        if (lesson) {
-            let id = lesson.id;
-            try {
-                await sendEvent("create-lecture", { user_cpf: cpf, lesson_id: id, payed, presence });
-                toast.success("Aula criada");
-                fetchData(null, null, setLessons, setLectures);
-            } catch (error) {
-                toast.error("Algo deu errado");
-            }
-        } 
-    } catch (error) {
-        toast.error("Algo deu errado");
-    }
-}
-
+ 
 const handleEditLecture = async (data, setLessons, setLectures) => {
     let { newLesson, newLecture } = data;
 
