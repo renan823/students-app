@@ -17,6 +17,8 @@ export default function Lessons () {
     const lecture = useRefreshStore((state: any) => state.lecture);
     const setLecture = useRefreshStore((state: any) => state.setLecture);
 
+    const [notPayed, setNotPayed] = useState(0);
+
     const [isOpen, setOpen] = useState(false);
     const [lecturesData, setLecturesData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -31,6 +33,8 @@ export default function Lessons () {
 
     useEffect(() => {
         setCurrentPage(1);
+        let notPayed = lecturesData.filter((item) => !item.payed);
+        setNotPayed(notPayed.length);
     }, [lecturesData]);
 
     useEffect(() => {
@@ -38,7 +42,6 @@ export default function Lessons () {
             try {
                 const data: any = await sendEvent("find-all-lectures-sorted-by-date");
                 setLecturesData(data);
-                console.log(data)
                 setCurrentPage(1);
             } catch (error) {
                 toast.error("Algo deu errado");
@@ -69,13 +72,13 @@ export default function Lessons () {
                             loading ? 
                                 <p>Carregando...</p>
                             :
-                                <h1 className="text-white text-xl font-bold"> 1 Pagamaneto(s) pendente(s)</h1>
+                                <h1 className="text-white text-xl font-bold">{notPayed} pagamento(s) pendente(s)</h1>
                         }
                     </div>
                 </div>
             </Layout.Header>
             <Layout.Content>
-            <div className="h-full flex flex-col gap-4">
+            <div className="h-full flex flex-col gap-3">
                     <h1 className="text-2xl font-bold text-slate-800 text-center">Aulas</h1>
                     <div className="h-5/6 w-full items-center overflow-y-auto p-2 flex flex-col content-center">
                         {

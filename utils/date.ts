@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
 export const days = "dom-seg-ter-qua-qui-sex-sab".split("-");
+export const months = "jan-fev-mar-abr-mai-jun-jul-ago-set-out-nov-dec".split("-")
 
 export function getDayName (date) {
     return days[date.day()];
@@ -55,6 +56,24 @@ export function timeDiff (time1, time2) {
 
 export function toInputDatetime (date) {
     return dayjs(date).format("YYYY-MM-DDTHH:mm");
+}
+
+export function monthIdentify (date) {
+    const newDate = dayjs(date).startOf("day");
+    const month = newDate.month();
+    const year = newDate.year();
+
+    return `${months[month]}/${year}`;
+}
+
+export function sortFarmattedDates (dates) {
+    let [month1, year1] = dates[0].split("/")
+    let date1 = dayjs().set("d", 1).set("y", parseInt(year1)).set("month", months.indexOf(month1));
+
+    let [month2, year2] = dates[1].split("/")
+    let date2 = dayjs().set("d", 1).set("y", parseInt(year2)).set("month", months.indexOf(month2));
+
+    return date1.isBefore(date2) ? -1 : 1;
 }
 
 export const today = dayjs().startOf("day");

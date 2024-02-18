@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateLecture, ILecture, ILesson, IStudent, ILectureWithStudentsAndValue } from "../domain/interfaces";
+import { ICreateLecture, ILecture } from "../domain/interfaces";
 
 class LectureDAO {
   prisma: PrismaClient;
@@ -82,6 +82,11 @@ class LectureDAO {
               },
             },
           },
+          orderBy: {
+            lesson: {
+              startAt: "desc"
+            } ,
+          },
           include: {
             user: true,
             lesson: true,
@@ -100,7 +105,9 @@ class LectureDAO {
     try {
       const lectures: ILecture[] = await this.prisma.lecture.findMany({
         orderBy: {
-          created_at: "desc",
+          lesson: {
+            startAt: "desc"
+          } ,
         },
         include: {
           lesson: true,
@@ -220,47 +227,27 @@ async findLecturesLastTenMonths(event: any): Promise<void> {
 
     const lectures: ILecture[] = await this.prisma.lecture.findMany({
       where: {
-        lesson: {
-          startAt: {
-            gte: tenMonthsAgo,
-            lte: currentDate,
-          },
-        },
-      },
-    });
-
-    const lecturesWithStudentsAndValue: ILectureWithStudentsAndValue[] = [];
-
-    for (const lecture of lectures) {
-      const lesson: ILesson | null = await this.prisma.lesson.findUnique({
-        where: {
-          id: lecture.lesson_id,
-        },
-      });
-
-      if (lesson) {
-        const students: IStudent[] = await this.prisma.user.findMany({
-          where: {
-            lectures: {
-              some: {
-                id: lecture.id,
+        AND: [
+          {
+            lesson: {
+              startAt: {
+                gte: tenMonthsAgo,
+                lte: currentDate,
               },
             },
           },
-        });
-
-        lecturesWithStudentsAndValue.push({
-          lecture,
-          students,
-          value: lesson.value,
-        });
+          {
+            payed: true
+          }
+        ]
+      },
+      include: {
+        user: true,
+        lesson: true
       }
-    }
-
-    return event.reply(
-      "find-lectures-last-ten-months-success",
-      lecturesWithStudentsAndValue
-    );
+    });
+    
+    return event.reply("find-lectures-last-ten-months-success", lectures);
   } catch (error: any) {
     return event.reply(
       "find-lectures-last-ten-months-error",
