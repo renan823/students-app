@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateLecture, ILecture } from "../domain/interfaces";
+import { ICreateLecture, ILecture, ILectureWithStudentAndLesson, ILesson, IStudent } from "../domain/interfaces";
 
 class LectureDAO {
   prisma: PrismaClient;
@@ -255,6 +255,66 @@ async findLecturesLastTenMonths(event: any): Promise<void> {
     );
   }
 }
+
+async findLecturesByStudentName(event: any, studentName: string): Promise<void> {
+  try {
+    const students: IStudent[] = await this.prisma.user.findMany({
+      where: {
+        name: {
+          contains: studentName,
+        },
+      },
+    });
+
+    const lecturesWithStudentAndLesson: ILectureWithStudentAndLesson[] = [];
+
+    for (const student of students) {
+      const lectures: ILecture[] = await this.prisma.lecture.findMany({
+        where: {
+          user_cpf: student.cpf,
+        },
+        include: {
+          lesson: true,
+        },
+      });
+
+      for (const lecture of lectures) {
+        const lesson: ILesson | null = await this.prisma.lesson.findUnique({
+          where: {
+            id: lecture.lesson_id,
+          },
+        });
+
+        if (lesson) {
+          lecturesWithStudentAndLesson.push({
+            student,
+            lesson,
+            lecture,
+          });
+        }
+      }
+    }
+
+    return event.reply("find-lectures-by-student-name-success", lecturesWithStudentAndLesson);
+  } catch (error: any) {
+    return event.reply("find-lectures-by-student-name-error", error.message);
+  }
+}
+
+async getTotalUnpaidLectures(event: any): Promise<void> {
+  try {
+    const totalUnpaidLectures: number = await this.prisma.lecture.count({
+      where: {
+        payed: false,
+      },
+    });
+
+    return event.reply("get-total-unpaid-lectures-success", totalUnpaidLectures);
+  } catch (error: any) {
+    return event.reply("get-total-unpaid-lectures-error", error.message);
+  }
+}
+
 }
 
 export default LectureDAO;

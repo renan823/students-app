@@ -76,3 +76,9 @@ export interface ILectureWithStudentsAndValue {
     students: IStudent[];
     value: number;
   }
+
+export interface ILectureWithStudentAndLesson {
+    student: IStudent;
+    lesson: ILesson;
+    lecture: ILecture;
+}
