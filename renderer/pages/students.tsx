@@ -7,8 +7,12 @@ import { toast } from "react-hot-toast";
 import Pagination from "../components/Pagination";
 import StudentCard from "../components/Student/StudentCard/StudentCard";
 import { Plus } from "lucide-react";
+import { useRefreshStore } from "../store";
 
 export default function Students () {
+
+    const student = useRefreshStore((state: any) => state.student);
+    const setStudent = useRefreshStore((state: any) => state.setStudent);
 
     const [loading, setLoading] = useState(true);
     const [studentsData, setStudentsData] = useState([]);
@@ -35,12 +39,13 @@ export default function Students () {
             } catch (error) {
                 toast.error("Algo deu errado");
             } finally {
+                setStudent(false);
                 setLoading(false);
             }
         }
 
         fetch();
-    }, [])
+    }, [student])
 
 	return (
 		<Layout.Root>

@@ -8,8 +8,10 @@ import { Modal } from "../../Modal";
 import StudentSearch from "../../Student/StudentSearch/StudentSearch";
 import Field from "../../Field";
 import Checkbox from "../../Checkbox";
+import { useRefreshStore } from "../../../store";
 
 export default function LectureModal ({ lecture, isOpen, setOpen }) {
+    const setLecture = useRefreshStore((state: any) => state.setLecture);
 
     let { lesson, user, payed, presence } = lecture;
     console.log(user)
@@ -22,7 +24,7 @@ export default function LectureModal ({ lecture, isOpen, setOpen }) {
     const defaultValues = { startAt, endAt, value, payed, presence };
 
     const [studentsData, setStudenstData] = useState([]);
-    const [selectedStudentData, setSelectedStudentData] = useState(user);
+    const [selectedStudentData, setSelectedStudentData] = useState({ student: user });
 
     const { control, setValue, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<EditLecture>({ defaultValues });
 
@@ -31,11 +33,18 @@ export default function LectureModal ({ lecture, isOpen, setOpen }) {
             let { startAt, endAt, value, payed, presence } = data;
             let cpf = selectedStudentData.student.cpf;
 
-            const newLesson = { startAt, endAt, value: parseFloat(value) };
+            const newLesson = { startAt, endAt, value: parseFloat(value), id: lesson.id };
             const newLecture = { user_cpf: cpf, lesson_id: lesson.id, id: lecture.id, payed, presence };
 
             try {
                 const result = await updateLecture(newLecture, newLesson);
+                if (result) {
+                    toast.success("Dados alterados");
+                    setLecture(true);
+                    handleClose();
+                } else {
+                    toast.error("Algo deu errado");
+                }
             } catch (error) {
                 toast.error("Algo deu errado");
             }

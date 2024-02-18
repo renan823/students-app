@@ -7,46 +7,15 @@ import { sendEvent } from "../../utils/api";
 import toast from "react-hot-toast";
 import Pagination from "../components/Pagination";
 import LectureCard from "../components/Lecture/LectureCard/LectureCard";
-
-/*
-    const [isOpen, setOpen] = useState(false);
-
-
-    return (
-        <div>
-            <div className="flex bg-white mx-2 my-6 items-center gap-10 rounded-md shadow-md shadow-slate-400">
-               <div className="flex w-3/5 justify-between p-3 bg-primaryBlue rounded-tl-md rounded-bl-md" onClick={() => setOpen(true)}>
-                    <div className="w-1/2 p-3 border-r-4 border-r-white ">
-                        <h2 className="text-white font-bold text-2xl">{student.name}</h2>
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-lg text-white">{DateService.getDay(lesson.startAt)}</h4>
-                        <h4 className="font-bold text-lg text-white">{DateService.getTime(lesson.startAt)} - {DateService.getTime(lesson.endAt)}</h4>
-                    </div>
-                </div>
-                <div className="flex items-center w-full gap-10 justify-around">
-                    <div className="p-2" onClick={() => handlePresence(lecture)}>
-                        <h4 style={{userSelect: "none"}} className="font-bold text-lg text-darkBlue">{lecture.presence ? "Presente" : "Ausente"}</h4>
-                    </div>
-                    <div>
-                        <div onClick={() => handlePayed(lecture)} className="bg-darkBlue flex gap-10 px-4 py-2 rounded-md items-center" style={{userSelect: "none"}}>
-                            <h3 className="text-white font-bold text-lg">Pagamento</h3>
-                            {
-                                lecture.payed ?
-                                    <CheckCircle color="white" size={30}/>
-                                :
-                                    <XCircle color="white" size={30}/>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <LectureModal isOpen={isOpen} closeModal={() => setOpen(false)} onSave={onEditLecture} data={data}/>
-        </div>
-    )
-}*/
+import { useRefreshStore } from "../store";
 
 export default function Lessons () {
+
+    const lesson = useRefreshStore((state: any) => state.lesson);
+    const setLesson = useRefreshStore((state: any) => state.setLesson);
+
+    const lecture = useRefreshStore((state: any) => state.lecture);
+    const setLecture = useRefreshStore((state: any) => state.setLecture);
 
     const [isOpen, setOpen] = useState(false);
     const [lecturesData, setLecturesData] = useState([]);
@@ -74,12 +43,14 @@ export default function Lessons () {
             } catch (error) {
                 toast.error("Algo deu errado");
             } finally {
+                setLesson(false);
+                setLecture(false);
                 setLoading(false);
             }
         }
 
         fetch();
-    }, [])
+    }, [lesson, lecture])
 
     return (
         <Layout.Root>
@@ -106,7 +77,7 @@ export default function Lessons () {
             <Layout.Content>
             <div className="h-full flex flex-col gap-4">
                     <h1 className="text-2xl font-bold text-slate-800 text-center">Aulas</h1>
-                    <div className="h-5/6 w-full overflow-y-auto p-2 flex flex-col content-center">
+                    <div className="h-5/6 w-full items-center overflow-y-auto p-2 flex flex-col content-center">
                         {
                             currentLectures.map((lecture, index) => {
                                 return (

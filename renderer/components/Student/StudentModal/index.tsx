@@ -7,6 +7,7 @@ import Select from "../../Select";
 import TextArea from "../../TextArea";
 import { addStudent, grades, splitPhones, updateStudent, years } from "./actions";
 import { toast } from "react-hot-toast";
+import { useRefreshStore } from "../../../store";
 
 interface StudentModalProps {
     isOpen: boolean,
@@ -16,6 +17,7 @@ interface StudentModalProps {
 }
 
 export default function StudentModal ({ isOpen, setOpen, student, phones }: StudentModalProps) {
+    const setStudent = useRefreshStore((state: any) => state.setStudent);
 
     const [action, setAction] = useState("create");
 
@@ -26,6 +28,7 @@ export default function StudentModal ({ isOpen, setOpen, student, phones }: Stud
             let result = await addStudent(data);
             if (result) {
                 toast.success("Aluno cadastrado");
+                setStudent(true);
                 handleClose();
             } else {
                 toast.error("Algo deu errado");
@@ -34,6 +37,7 @@ export default function StudentModal ({ isOpen, setOpen, student, phones }: Stud
             let result = await updateStudent(data, phones);
             if (result) {
                 toast.success("Dados atualizados");
+                setStudent(true);
                 handleClose();
             } else {
                 toast.error("Algo deu errado");

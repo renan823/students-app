@@ -6,9 +6,12 @@ import { useState } from "react";
 import StudentSearch from "../../Student/StudentSearch/StudentSearch";
 import { addLesson } from "./actions";
 import { toast } from "react-hot-toast";
+import { useRefreshStore } from "../../../store";
 
 
 export default function LessonModal ({ isOpen, setOpen }) {
+    const setLesson = useRefreshStore((state: any) => state.setLesson);
+
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<Lesson>();
 
     const [studentsData, setStudenstData] = useState([]);
@@ -21,6 +24,7 @@ export default function LessonModal ({ isOpen, setOpen }) {
                 const result = await addLesson(data, selectedStudentData.student);
                 if (result) {
                     toast.success("Aula criada");
+                    setLesson(true);
                     handleClose()
                 } else {
                     toast.error("Algo deu errado");
