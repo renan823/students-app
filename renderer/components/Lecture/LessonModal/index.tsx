@@ -45,13 +45,15 @@ export default function LessonModal ({ isOpen, setOpen }) {
         <Modal.Root isOpen={isOpen}>
             <Modal.Header title="Adicionar aulas" handleClose={handleClose}/>
             <Modal.Content>
-                <div className="p-4">
-                    <StudentSearch setSearchResults={setStudenstData} selector={false}/>
-                    <div className="h-24 overflow-y-auto p-2 flex flex-col">
+                <div className="my-2">
+                    <div className="p-5">
+                        <StudentSearch setSearchResults={setStudenstData} selector={false}/>
+                    </div>
+                    <div className="h-28 overflow-y-auto p-4 flex flex-col">
                         {
                             studentsData.map((data, index) => {
                                 return (
-                                    <button className="m-2 bg-slate-400 flex" onClick={() => setSelectedStudentData(data)}>
+                                    <button className="p-2 flex border-2 border-slate-500 m-1 rounded-sm" onClick={() => setSelectedStudentData(data)}>
                                         <h2 key={index} className="font-bold">{data.student.name}</h2>
                                     </button>
                                 )

@@ -9,12 +9,6 @@ export default function DayPlanner ({ lectures }) {
     const weekStart = toInputDate(week[0].date);
 	const weekEnd = toInputDate(week[6].date);
 
-    console.log(week)
-
-    console.log(weekStart, weekEnd);
-
-    console.log(lectures)
-
     const events = [];
 
     Object.keys(lectures).forEach((day) => {

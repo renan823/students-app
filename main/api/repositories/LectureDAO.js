@@ -232,39 +232,20 @@ class LectureDAO {
     }
     async findLecturesByStudentName(event, studentName) {
         try {
-            const students = await this.prisma.user.findMany({
+            const lectures = await this.prisma.lecture.findMany({
                 where: {
-                    name: {
-                        contains: studentName,
-                    },
-                },
-            });
-            const lecturesWithStudentAndLesson = [];
-            for (const student of students) {
-                const lectures = await this.prisma.lecture.findMany({
-                    where: {
-                        user_cpf: student.cpf,
-                    },
-                    include: {
-                        lesson: true,
-                    },
-                });
-                for (const lecture of lectures) {
-                    const lesson = await this.prisma.lesson.findUnique({
-                        where: {
-                            id: lecture.lesson_id,
-                        },
-                    });
-                    if (lesson) {
-                        lecturesWithStudentAndLesson.push({
-                            student,
-                            lesson,
-                            lecture,
-                        });
+                    user: {
+                        name: {
+                            contains: studentName
+                        }
                     }
+                },
+                include: {
+                    user: true,
+                    lesson: true
                 }
-            }
-            return event.reply("find-lectures-by-student-name-success", lecturesWithStudentAndLesson);
+            });
+            return event.reply("find-lectures-by-student-name-success", lectures);
         }
         catch (error) {
             return event.reply("find-lectures-by-student-name-error", error.message);

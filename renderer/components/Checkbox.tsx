@@ -10,8 +10,15 @@ export default function Checkbox ({ name, checked, control,  label, error, ...ar
             render={({ field: { value, onChange } }) => {
                 return (
                     <div className="w-full p-2">
-                        <h3 className="font-bold text-lg">{label}</h3>
-                        <input type="checkbox" {...args} onChange={onChange} checked={value} className="w-full p-2 font-bold border-2 border-darkBlue rounded-md"/>
+                        <div className="flex items-center">
+                            <h3 className="font-bold text-lg mx-4">{label}</h3>
+                            <input 
+                                type="checkbox" 
+                                {...args} 
+                                onChange={onChange} checked={value} 
+                                className="w-5 h-5"
+                            />
+                        </div>
                         <div>
                             {error && <span className="font-bold text-primaryBlue">preencha corretamente o campo</span>}
                         </div>

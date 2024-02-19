@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateLecture, ILecture, ILectureWithStudentAndLesson, ILesson, IStudent } from "../domain/interfaces";
+import { ICreateLecture, ILecture } from "../domain/interfaces";
 
 class LectureDAO {
   prisma: PrismaClient;
@@ -258,44 +258,21 @@ async findLecturesLastTenMonths(event: any): Promise<void> {
 
 async findLecturesByStudentName(event: any, studentName: string): Promise<void> {
   try {
-    const students: IStudent[] = await this.prisma.user.findMany({
+    const lectures: ILecture[] = await this.prisma.lecture.findMany({
       where: {
-        name: {
-          contains: studentName,
-        },
+        user: {
+          name: {
+            contains: studentName
+          }
+        }
       },
+      include: {
+        user: true,
+        lesson: true
+      }
     });
 
-    const lecturesWithStudentAndLesson: ILectureWithStudentAndLesson[] = [];
-
-    for (const student of students) {
-      const lectures: ILecture[] = await this.prisma.lecture.findMany({
-        where: {
-          user_cpf: student.cpf,
-        },
-        include: {
-          lesson: true,
-        },
-      });
-
-      for (const lecture of lectures) {
-        const lesson: ILesson | null = await this.prisma.lesson.findUnique({
-          where: {
-            id: lecture.lesson_id,
-          },
-        });
-
-        if (lesson) {
-          lecturesWithStudentAndLesson.push({
-            student,
-            lesson,
-            lecture,
-          });
-        }
-      }
-    }
-
-    return event.reply("find-lectures-by-student-name-success", lecturesWithStudentAndLesson);
+    return event.reply("find-lectures-by-student-name-success", lectures);
   } catch (error: any) {
     return event.reply("find-lectures-by-student-name-error", error.message);
   }

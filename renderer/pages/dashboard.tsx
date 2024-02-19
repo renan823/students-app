@@ -97,9 +97,9 @@ const MoneyTable = ({ data }) => {
     return (
         <div className="w-full h-4/5 overflow-y-auto">
             {
-                monthDates.map((month) => {
+                monthDates.map((month, index) => {
                     return (
-                        <div className="flex justify-center">
+                        <div key={index} className="flex justify-center">
                             <div className="w-2/3 flex flex-col">
                                 <div className="flex w-full justify-between p-2 border-b-2 border-b-darkBlue">
                                     <h1 className="font-bold text-xl">{month}</h1>

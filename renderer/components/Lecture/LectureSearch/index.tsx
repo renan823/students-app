@@ -36,7 +36,12 @@ export default function LectureSearch ({ setSearchResults }: LectureSearchProps)
     return (
         <div className="flex gap-10">
             <div>
-                <input type="text" placeholder="Buscar aulas por nome do aluno" onChange={(event) => setSearchParam(event.target.value)}/>
+                <input 
+                    type="text" 
+                    placeholder="Buscar aulas por nome do aluno" 
+                    onChange={(event) => setSearchParam(event.target.value)}
+                    className="p-2 border-2 border-darkBlue focus:border-darkBlue placeholder:text-slate-600 text-slate-600 font-bold"
+                />
             </div>
         </div>
     )

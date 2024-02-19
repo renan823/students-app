@@ -39,16 +39,16 @@ export default function StudentSearch ({ setSearchResults, selector }: SearchStu
     
     return (
         <div className="flex gap-10">
-            <div className="flex">
+            <div className="flex items-center">
                 <div>
                     {
                         selector ?
                             <div>
-                                <select onChange={(event) => setSelectorType(event.target.value)}>
+                                <select className="p-3 bg-darkBlue font-bold text-white" onChange={(event) => setSelectorType(event.target.value)}>
                                     {
                                         Object.keys(searchOptions).map((key, index) => {
                                             return (
-                                                <option key={index} value={key}>{searchOptions[key]}</option>
+                                                <option className="font-bold text-white" key={index} value={key}>{searchOptions[key]}</option>
                                             )
                                         })
                                     }
@@ -59,7 +59,12 @@ export default function StudentSearch ({ setSearchResults, selector }: SearchStu
                     }
                 </div>
                 <div>
-                    <input type="text" placeholder={`Buscar alunos pelo ${searchOptions[selectorType]}`} onChange={(event) => setSearchParam(event.target.value)}/>
+                    <input 
+                        className="p-2 border-2 border-darkBlue focus:border-darkBlue placeholder:text-slate-600 text-slate-600 font-bold"
+                        type="text" 
+                        placeholder={`Buscar alunos pelo ${searchOptions[selectorType]}`} 
+                        onChange={(event) => setSearchParam(event.target.value)}
+                    />
                 </div>
             </div>
         </div>
