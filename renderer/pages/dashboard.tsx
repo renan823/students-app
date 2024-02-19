@@ -106,10 +106,10 @@ const MoneyTable = ({ data }) => {
                                     <h1 className="font-bold text-xl">R${months[month].amount}</h1>
                                 </div>
                                 {
-                                    Object.keys(months[month]).map((student) => {
+                                    Object.keys(months[month]).map((student, index) => {
                                         if (student !== "amount") {
                                             return (
-                                                <div className="flex justify-between my-2  w-full p-4 bg-primaryBlue rounded-md shadow-md shadow-slate-400">
+                                                <div key={index} className="flex justify-between my-2  w-full p-4 bg-primaryBlue rounded-md shadow-md shadow-slate-400">
                                                     <div className="flex w-2/3">
                                                         <h1 className="w-1/2 text-lg font-bold text-white">{months[month][student].name}</h1>
                                                         <h1 className="text-lg font-bold text-white">{months[month][student].lessons} aula(s)</h1>

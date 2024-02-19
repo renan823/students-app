@@ -56,7 +56,7 @@ export function StudentCardDebtAlert ({ debt }) {
     )
 }
 
-export default function StudentCard ({ student, phones, debtAmout }) {
+export default function StudentCard ({ student, phones, debtAmout, index }) {
 
     const [isOpen, setOpen] = useState(false);
 
@@ -69,7 +69,7 @@ export default function StudentCard ({ student, phones, debtAmout }) {
     const payload = { name, motherName, bornDate, cpf, observation, gradeYear, gradeType, phone1, phone2 };
 
     return (
-        <div>
+        <div key={index}>
             <div className="w-11/12 flex rounded-md shadow-md shadow-slate-500 my-8" onClick={() => setOpen(!isOpen)}>
                 <StudentCardIcon debt={debtAmout}/>
                 <div className="bg-white flex w-full rounded-tr-md rounded-br-md p-2">

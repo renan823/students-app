@@ -207,9 +207,7 @@ ipcMain.on("find-all-lectures", (event) => {
 });
 
 ipcMain.on("find-lectures-by-week", (event) => {
-	console.log("eai")
 	lectureDAO.findLecturesByWeek(event).catch(error => console.error(error));
-	console.log("aefwewc")
 });
 
 ipcMain.on("find-all-lectures-sorted-by-date", (event, skip, take) => {

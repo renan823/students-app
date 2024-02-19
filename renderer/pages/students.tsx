@@ -76,7 +76,7 @@ export default function Students () {
                         {
                             currentStudents.map((data, index) => {
                                 return (
-                                    <StudentCard student={data.student} phones={data.phones} debtAmout={data.debtAmount}/>
+                                    <StudentCard key={index} index={index} student={data.student} phones={data.phones} debtAmout={data.debtAmount}/>
                                 )
                             })
                         }
