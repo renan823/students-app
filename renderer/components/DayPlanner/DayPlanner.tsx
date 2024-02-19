@@ -1,58 +1,59 @@
-import DateService from "../../utils/DateService";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { getFullWeek, toInputDate } from "../../../utils/date"
 
 export default function DayPlanner ({ lectures }) {
 
+    const week = getFullWeek();
+    const weekStart = toInputDate(week[0].date);
+	const weekEnd = toInputDate(week[6].date);
+
+    console.log(week)
+
+    console.log(weekStart, weekEnd);
+
     console.log(lectures)
 
-    const hours = Array.from({length: 17}, (_, index) => index+6);
+    const events = [];
+
+    Object.keys(lectures).forEach((day) => {
+        lectures[day].forEach((event) => {
+            let start = new Date(event.lesson.startAt).toISOString();
+            let end = new Date(event.lesson.endAt).toISOString();
+            let title = `Aula com ${event.user.name}`;
+            let color = event.payed ? "#593FD8" : "#D81CB3";
+
+            events.push({ title, start, end, color });
+        })
+    })
+
 
     return (
-        <div className="flex h-5/6 w-full overflow-y-auto gap-10">
-            <div className="">
-                {
-                    hours.map((hour, index) => {
-                        return (
-                            <div className="w-full my-4 rounded-md bg-fuchsia-600" style={{height: 100}}>
-                                <h3>{hour <=9 ? `0${hour}:00` : `${hour}:00`}</h3>
-                            </div>
-                        )
-                    })
-                }
-            </div>
-            <div className="w-full">
-                {
-                    hours.map((hour, index) => {
-                        return (
-                            <div className="w-full my-4 rounded-md" style={{height: 100}}>
-                                {
-                                    lectures?.map((lecture) => {
-                                        let lessonStart = DateService.getTime(lecture.lesson.startAt);
-                                        let lessonEnd = DateService.getTime(lecture.lesson.endAt);
-                                        let diff = DateService.timeDiff(lessonEnd, lessonStart);
-
-                                        let time = hour <=9 ? `0${hour}:00` : `${hour}:00`;
-
-                                        let size = 100 * diff;
-
-                                        if (lessonStart === time){
-                                            return (
-                                                <div className="bg-red-500 mx-2" style={{height: size, backgroundColor: "red"}}>
-                                                    <h1>{lecture.user.name}</h1>
-                                                </div>
-                                            )
-                                        }
-                                        return (
-                                            <div className="bg-red-500 mx-2" style={{height: size, backgroundColor: "red"}}>
-                                                    
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                        )
-                    })
-                }
-            </div>
+        <div>
+            <FullCalendar 
+                plugins={[ timeGridPlugin, interactionPlugin ]}
+                initialView="timeGridWeek"
+                locale="pt-br"
+                visibleRange={{ start: weekStart, end: weekEnd }} 
+                dayHeaders={true} 
+                allDaySlot={false}
+                expandRows={true}
+                slotMinTime="06:00:00"
+                slotMaxTime="23:00:00"
+                slotDuration="01:00:00"
+                dayHeaderFormat={{ weekday: 'short', month: 'numeric', day: 'numeric', year: 'numeric' }}
+			    headerToolbar={false}
+                events={events}
+                eventContent={(content) => {
+                    return (
+                          <div>
+                            <h1 className='font-bold text-lg'>{content.event.title}</h1>
+                            <h1 className='font-bold text-lg'>{content.timeText}</h1> 
+                        </div>
+                    );
+                }}
+            />
         </div>
     )
 }

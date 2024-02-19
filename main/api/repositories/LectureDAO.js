@@ -230,5 +230,58 @@ class LectureDAO {
             return event.reply("find-lectures-last-ten-months-error", error.message);
         }
     }
+    async findLecturesByStudentName(event, studentName) {
+        try {
+            const students = await this.prisma.user.findMany({
+                where: {
+                    name: {
+                        contains: studentName,
+                    },
+                },
+            });
+            const lecturesWithStudentAndLesson = [];
+            for (const student of students) {
+                const lectures = await this.prisma.lecture.findMany({
+                    where: {
+                        user_cpf: student.cpf,
+                    },
+                    include: {
+                        lesson: true,
+                    },
+                });
+                for (const lecture of lectures) {
+                    const lesson = await this.prisma.lesson.findUnique({
+                        where: {
+                            id: lecture.lesson_id,
+                        },
+                    });
+                    if (lesson) {
+                        lecturesWithStudentAndLesson.push({
+                            student,
+                            lesson,
+                            lecture,
+                        });
+                    }
+                }
+            }
+            return event.reply("find-lectures-by-student-name-success", lecturesWithStudentAndLesson);
+        }
+        catch (error) {
+            return event.reply("find-lectures-by-student-name-error", error.message);
+        }
+    }
+    async getTotalUnpaidLectures(event) {
+        try {
+            const totalUnpaidLectures = await this.prisma.lecture.count({
+                where: {
+                    payed: false,
+                },
+            });
+            return event.reply("get-total-unpaid-lectures-success", totalUnpaidLectures);
+        }
+        catch (error) {
+            return event.reply("get-total-unpaid-lectures-error", error.message);
+        }
+    }
 }
 exports.default = LectureDAO;

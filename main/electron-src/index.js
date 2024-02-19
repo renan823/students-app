@@ -181,3 +181,9 @@ electron_1.ipcMain.on("get-total-profit-by-month", (event, month, year) => {
 electron_1.ipcMain.on("find-lectures-last-ten-months", (event) => {
     lectureDAO.findLecturesLastTenMonths(event).catch(error => console.error(error));
 });
+electron_1.ipcMain.on("find-lectures-by-student-name", (event, name) => {
+    lectureDAO.findLecturesByStudentName(event, name).catch(error => console.error(error));
+});
+electron_1.ipcMain.on("get-total-unpaid-lectures", (event) => {
+    lectureDAO.getTotalUnpaidLectures(event).catch(error => console.error(error));
+});
