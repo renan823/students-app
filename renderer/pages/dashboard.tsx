@@ -1,6 +1,7 @@
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from "react";
 import { Layout } from "../components/Layout"
-import Chart from "react-apexcharts";
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import { sendEvent } from "../../utils/api";
 import { toast } from "react-hot-toast";
 import { monthIdentify, sortFarmattedDates } from "../../utils/date";
@@ -63,7 +64,14 @@ const MoneyChart = ({ data }) => {
     }]
 
     return (
-        <Chart options={options} series={series} height="100%" width="100%" type="line"/>
+        <>
+            {
+                window !== undefined ?
+                    <Chart options={options} series={series} height="100%" width="100%" type="line"/>
+                :
+                    <p>Erro ao carregar gráfico</p>
+            }
+        </>
     )
 }
 

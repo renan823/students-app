@@ -17,26 +17,6 @@ class LectureDAO {
     }
   }
 
-  async findById(event: any, id: string) {
-    try {
-      const result: ILecture | null = await this.prisma.lecture.findUnique({
-        where: { id },
-      });
-      return event.reply("find-lecture-by-id-success", result);
-    } catch (error: any) {
-      return event.reply("find-lecture-by-id-error", error.message);
-    }
-  }
-
-  async findAll(event: any) {
-    try {
-      const result: ILecture[] = await this.prisma.lecture.findMany();
-      return event.reply("find-all-lectures-success", result);
-    } catch (error: any) {
-      return event.reply("find-all-lectures-error", error.message);
-    }
-  }
-
   async update(event: any, id: string, newData: object | any) {
     try {
       const result: ILecture = await this.prisma.lecture.update({
@@ -49,24 +29,13 @@ class LectureDAO {
     }
   }
 
-  async delete(event: any, id: string) {
-    try {
-      const result: ILecture = await this.prisma.lecture.delete({
-        where: { id },
-      });
-      return event.reply("delete-lecture-success", result);
-    } catch (error: any) {
-      return event.reply("delete-lecture-error", error.message);
-    }
-  }
-
   async findLecturesByWeek(event: any) {
     try {
       const currentDate = new Date();
       const startDate = new Date(currentDate);
-      startDate.setDate(startDate.getDate() - (startDate.getDay() + 6) % 7); // Domingo
+      startDate.setDate(startDate.getDate() - (startDate.getDay() + 6) % 7); 
       const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 6); // Sábado
+      endDate.setDate(endDate.getDate() + 6); 
   
       const lecturesByDay: Record<string, ILecture[]> = {};
   
@@ -123,175 +92,67 @@ class LectureDAO {
     }
   }
 
-  async findAllLecturesByStudentCPF(
-    event: any,
-    user_cpf: string,
-    skip: number,
-    take: number
-  ) {
+  
+  async findLecturesLastTenMonths(event: any): Promise<void> {
     try {
+      const currentDate = new Date();
+
+      const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 20, 59, 59, 999)
+      const tenMonthsAgo = new Date(currentMonth);
+      tenMonthsAgo.setMonth(tenMonthsAgo.getMonth() - 10);
+
       const lectures: ILecture[] = await this.prisma.lecture.findMany({
         where: {
-          user_cpf,
-        },
-        orderBy: {
-          lesson: {
-            created_at: "desc",
-          },
-        },
-        skip,
-        take,
-      });
-
-      return event.reply("find-all-lectures-by-student-cpf-success", lectures);
-    } catch (error: any) {
-      return event.reply("find-all-lectures-by-student-cpf-error", error.message);
-    }
-  }
-
-  async findAllLecturesByMonth(event: any, month: number, year: number) {
-    try {
-      const lectures: ILecture[] = await this.prisma.lecture.findMany({
-        where: {
-          lesson: {
-            startAt: {
-              gte: new Date(year, month - 1, 1),
-              lt: new Date(year, month, 1),
+          AND: [
+            {
+              lesson: {
+                startAt: {
+                  gte: tenMonthsAgo,
+                  lte: currentMonth,
+                },
+              },
             },
-          },
+            {
+              payed: true
+            }
+          ]
         },
         include: {
           user: true,
-          lesson: true,
-        },
+          lesson: true
+        }
       });
-      return event.reply("find-lectures-by-month-success", lectures);
-    } catch (error: any) {
-      return event.reply("find-lectures-by-month-error", error.message);
-    }
-  }
-
-  async findAllLecturesByStudentAndMonth(
-    event: any,
-    user_cpf: string,
-    month: number,
-    year: number
-  ) {
-    try {
-      const lectures: ILecture[] = await this.prisma.lecture.findMany({
-        where: {
-          user_cpf,
-          lesson: {
-            startAt: {
-              gte: new Date(year, month - 1, 1),
-              lt: new Date(year, month, 1),
-            },
-          },
-        },
-        include: { lesson: true },
-      });
-      return event.reply("find-all-lectures-by-student-and-month-success", lectures);
+      
+      return event.reply("find-lectures-last-ten-months-success", lectures);
     } catch (error: any) {
       return event.reply(
-        "find-all-lectures-by-student-and-month-error",
+        "find-lectures-last-ten-months-error",
         error.message
       );
     }
   }
 
-  async getTotalProfitByMonth(event: any, month: number, year: number) {
+  async findLecturesByStudentName(event: any, studentName: string): Promise<void> {
     try {
-        const profitByMonth: any[] = await this.prisma.$queryRaw`
-            SELECT 
-                SUM(ls.value) AS total_profit
-            FROM
-                lectures l
-                JOIN lessons ls ON l.lesson_id = ls.id
-            WHERE
-                l.payed = true
-                AND EXTRACT(MONTH FROM ls.start_at) = ${month};
-                AND EXTRACT(YEAR FROM ls.start_at) = ${year};
-        `;
-
-        return event.reply("get-total-profit-by-month-success", profitByMonth[0].total_profit);
-    } catch (error: any) {
-        return event.reply("get-total-profit-by-month-error", error.message);
-    }
-}
-
-async findLecturesLastTenMonths(event: any): Promise<void> {
-  try {
-    const currentDate = new Date();
-    const tenMonthsAgo = new Date(currentDate);
-    tenMonthsAgo.setMonth(tenMonthsAgo.getMonth() - 10);
-
-    const lectures: ILecture[] = await this.prisma.lecture.findMany({
-      where: {
-        AND: [
-          {
-            lesson: {
-              startAt: {
-                gte: tenMonthsAgo,
-                lte: currentDate,
-              },
-            },
-          },
-          {
-            payed: true
+      const lectures: ILecture[] = await this.prisma.lecture.findMany({
+        where: {
+          user: {
+            name: {
+              contains: studentName
+            }
           }
-        ]
-      },
-      include: {
-        user: true,
-        lesson: true
-      }
-    });
-    
-    return event.reply("find-lectures-last-ten-months-success", lectures);
-  } catch (error: any) {
-    return event.reply(
-      "find-lectures-last-ten-months-error",
-      error.message
-    );
-  }
-}
-
-async findLecturesByStudentName(event: any, studentName: string): Promise<void> {
-  try {
-    const lectures: ILecture[] = await this.prisma.lecture.findMany({
-      where: {
-        user: {
-          name: {
-            contains: studentName
-          }
+        },
+        include: {
+          user: true,
+          lesson: true
         }
-      },
-      include: {
-        user: true,
-        lesson: true
-      }
-    });
+      });
 
-    return event.reply("find-lectures-by-student-name-success", lectures);
-  } catch (error: any) {
-    return event.reply("find-lectures-by-student-name-error", error.message);
+      return event.reply("find-lectures-by-student-name-success", lectures);
+    } catch (error: any) {
+      return event.reply("find-lectures-by-student-name-error", error.message);
+    }
   }
-}
-
-async getTotalUnpaidLectures(event: any): Promise<void> {
-  try {
-    const totalUnpaidLectures: number = await this.prisma.lecture.count({
-      where: {
-        payed: false,
-      },
-    });
-
-    return event.reply("get-total-unpaid-lectures-success", totalUnpaidLectures);
-  } catch (error: any) {
-    return event.reply("get-total-unpaid-lectures-error", error.message);
-  }
-}
-
 }
 
 export default LectureDAO;

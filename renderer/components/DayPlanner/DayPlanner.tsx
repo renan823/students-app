@@ -42,8 +42,8 @@ export default function DayPlanner ({ lectures }) {
                 eventContent={(content) => {
                     return (
                           <div>
-                            <h1 className='font-bold text-lg'>{content.event.title}</h1>
-                            <h1 className='font-bold text-lg'>{content.timeText}</h1> 
+                            <h1 className='font-bold'>{content.event.title}</h1>
+                            <h1 className='font-bold'>{content.timeText}</h1> 
                         </div>
                     );
                 }}

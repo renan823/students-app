@@ -1,7 +1,13 @@
 {
   "private": true,
   "main": "main/electron-src/index.js",
-  "productName": "Students App",
+  "productName": "Gestão de alunos",
+  "name": "students-app",
+  "version": "1.0.0",
+  "authors": [
+    "Arthur de Vicente Mascaro",
+    "Renan Trofino Silva"
+  ],
   "scripts": {
     "clean": "rimraf dist main renderer/out renderer/.next",
     "dev": "npm run build-electron && electron .",
@@ -45,10 +51,21 @@
     "typescript": "^4.9.5"
   },
   "build": {
-    "asar": true,
-    "files": [
-      "main",
-      "renderer/out"
-    ]
+    "appId": "com.electron.app",
+    "productName": "Gestão de alunos",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64", 
+            "arm64" 
+          ]
+        }
+      ]
+    }
   }
 }

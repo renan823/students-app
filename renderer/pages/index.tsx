@@ -17,6 +17,7 @@ export default function Index () {
 				const data: any = await sendEvent("find-lectures-by-week");
 				setWeekData(data);
 			} catch (error) {
+				console.log(error)
 				toast.error("Algo deu errado");
 			} finally {
 				setLoading(false);
