@@ -1,19 +1,24 @@
-export default function Pagination ({ totalData, perPage, setCurrentPage, currentPage }) {
-    let pages = [];
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-    for (let i = 1; i <= Math.ceil(totalData/perPage); i++) {
-        pages.push(i);
+export default function Pagination ({ max, setCurrentPage, currentPage }) {
+
+    function handleBack () {
+        setCurrentPage(currentPage-1);
+    }
+
+    function handleNext () {
+        setCurrentPage(currentPage+1);
     }
     
     return (
-        <div className="flex w-10/12 overflow-x-auto items-center justify-evenly">
-            {
-                pages.map((page, index) => {
-                    return (
-                        <button className={`font-bold flex items-center justify-center w-6 h-6 rounded-sm ${currentPage === page ? "bg-darkBlue text-white" : "border-2 border-darkBlue text-darkBlue"}`} key={index} onClick={() => setCurrentPage(page)}>{page}</button>
-                    )
-                })
-            }
+        <div className="flex">
+            <button disabled={currentPage === 1 ? true : false} onClick={handleBack}>
+                <ChevronLeft size={30}/>
+            </button>
+            <h1 className="bg-darkBlue py-2 px-4 rounded-sm text-white font-bold text-lg">{currentPage}</h1>
+            <button disabled={max <= currentPage} onClick={handleNext}>
+                <ChevronRight size={30}/>
+            </button>
         </div>
     )
 }

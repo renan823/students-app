@@ -18,6 +18,8 @@
 
 # production
 /build
+/dist
+/renderer/.next
 
 # misc
 .DS_Store

@@ -1,13 +1,75 @@
-import dynamic from 'next/dynamic'
 import { useEffect, useState } from "react";
-import { Layout } from "../components/Layout"
+import { sendEvent } from "../utils/event";
+import toast from "react-hot-toast";
+import { Layout } from "../components/Layout";
+import { monthIdentify, sortFarmattedDates } from "../utils/date";
+import dynamic from "next/dynamic";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import dayjs from "dayjs";
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-import { sendEvent } from "../../utils/api";
-import { toast } from "react-hot-toast";
-import { monthIdentify, sortFarmattedDates } from "../../utils/date";
 
-const MoneyChart = ({ data }) => {
+function MoneyTable ({ data }) {
+    const months = {};
 
+    data.forEach((item) => {
+        let month = monthIdentify(item.lesson.startAt);
+        if (!months.hasOwnProperty(month)) {
+            months[month] = { amount: 0 };
+        }
+
+        let cpf = item.studentCpf;
+
+        if (!months[month].hasOwnProperty(cpf)) {
+            let name = item.student.name;
+            months[month][cpf] = { name, amount: 0, lessons: 0 };
+        }
+
+        months[month][cpf].amount += item.lesson.value;
+        months[month][cpf].lessons += 1;
+        months[month].amount += item.lesson.value;
+    })
+
+    const monthDates = Object.keys(months);
+    monthDates.sort((a, b) => sortFarmattedDates([a, b]));
+
+    monthDates.reverse();
+
+    return (
+        <div className="w-full h-4/5 overflow-y-auto">
+            {
+                monthDates.map((month, index) => {
+                    return (
+                        <div key={index} className="flex justify-center">
+                            <div className="w-2/3 flex flex-col">
+                                <div className="flex w-full justify-between p-2 border-b-2 border-b-darkBlue">
+                                    <h1 className="font-bold text-xl">{month}</h1>
+                                    <h1 className="font-bold text-xl">R${months[month].amount}</h1>
+                                </div>
+                                {
+                                    Object.keys(months[month]).map((student, index) => {
+                                        if (student !== "amount") {
+                                            return (
+                                                <div key={index} className="flex justify-between my-2  w-full p-4 bg-primaryBlue rounded-md shadow-md shadow-slate-400">
+                                                    <div className="flex w-2/3">
+                                                        <h1 className="w-1/2 text-lg font-bold text-white">{months[month][student].name}</h1>
+                                                        <h1 className="text-lg font-bold text-white">{months[month][student].lessons} aula(s)</h1>
+                                                    </div>
+                                                    <h1 className="text-lg font-bold text-white">R${months[month][student].amount}</h1>
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                    )
+                })
+            }
+        </div>
+    )
+}
+
+function MoneyChart ({ data }) {
     const months = {};
 
     data.forEach((item) => {
@@ -75,64 +137,46 @@ const MoneyChart = ({ data }) => {
     )
 }
 
-const MoneyTable = ({ data }) => {
+function DayMoney () {
 
-    const months = {};
+    const [day, setDay] = useState(dayjs().startOf("day"));
+    const [value, setValue] = useState(0);
 
-    data.forEach((item) => {
-        let month = monthIdentify(item.lesson.startAt);
-        if (!months.hasOwnProperty(month)) {
-            months[month] = { amount: 0 };
+    function nextDay () {
+        setDay(day.add(1, "day"));
+    }
+
+    function prevDay () {
+        setDay(day.add(-1, "day"));
+    }
+
+    useEffect(() => {
+        async function fetch () {
+            try {
+                const total: any = await sendEvent("sum-lectures-by-day", day.format("MM/DD/YYYY"));
+                console.log(total)
+                setValue(total)
+            } catch (error: any) {
+                console.log(error)
+                setValue(0);
+            } 
         }
 
-        let cpf = item.user_cpf;
-
-        if (!months[month].hasOwnProperty(cpf)) {
-            let name = item.user.name;
-            months[month][cpf] = { name, amount: 0, lessons: 0 };
-        }
-
-        months[month][cpf].amount += item.lesson.value;
-        months[month][cpf].lessons += 1;
-        months[month].amount += item.lesson.value;
-    })
-
-    const monthDates = Object.keys(months);
-    monthDates.sort((a, b) => sortFarmattedDates([a, b]));
-
-    monthDates.reverse();
+        fetch();
+    }, [day])
 
     return (
-        <div className="w-full h-4/5 overflow-y-auto">
-            {
-                monthDates.map((month, index) => {
-                    return (
-                        <div key={index} className="flex justify-center">
-                            <div className="w-2/3 flex flex-col">
-                                <div className="flex w-full justify-between p-2 border-b-2 border-b-darkBlue">
-                                    <h1 className="font-bold text-xl">{month}</h1>
-                                    <h1 className="font-bold text-xl">R${months[month].amount}</h1>
-                                </div>
-                                {
-                                    Object.keys(months[month]).map((student, index) => {
-                                        if (student !== "amount") {
-                                            return (
-                                                <div key={index} className="flex justify-between my-2  w-full p-4 bg-primaryBlue rounded-md shadow-md shadow-slate-400">
-                                                    <div className="flex w-2/3">
-                                                        <h1 className="w-1/2 text-lg font-bold text-white">{months[month][student].name}</h1>
-                                                        <h1 className="text-lg font-bold text-white">{months[month][student].lessons} aula(s)</h1>
-                                                    </div>
-                                                    <h1 className="text-lg font-bold text-white">R${months[month][student].amount}</h1>
-                                                </div>
-                                            )
-                                        }
-                                    })
-                                }
-                            </div>
-                        </div>
-                    )
-                })
-            }
+        <div className="flex items-center">
+            <div className="flex">
+                <button onClick={prevDay}>
+					<ChevronLeft size={30}/>
+				</button>
+				<h2 className="text-darkBlue text-xl font-bold">Dia {day.format("DD/MM/YYYY")}</h2>
+				<button onClick={nextDay}>
+					<ChevronRight size={30}/>
+				</button>
+            </div>
+            <h2 className="font-bold text-xl">Valor: R${value}</h2>
         </div>
     )
 }
@@ -153,7 +197,7 @@ export default function Dashboard () {
     useEffect(() => {
         const fetch = async () => {
             try {
-                const result: any = await sendEvent("find-lectures-last-ten-months");
+                const result: any = await sendEvent("lectures-months-ago", 10);
                 setData(result);
                 setLoading(false);
             } catch (error) {
@@ -169,6 +213,7 @@ export default function Dashboard () {
         <Layout.Root>
             <Layout.Header>
                 <h1 className="text-3xl font-bold text-darkBlue">Resultados Financeiros</h1>
+                <DayMoney/>
             </Layout.Header>
             <Layout.Content>
                 <div className="flex h-full flex-col gap-3 items-center">

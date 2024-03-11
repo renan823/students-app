@@ -1,11 +1,6 @@
 import { X } from "lucide-react"
 
-interface ModalHeaderProps {
-    title: string
-    handleClose: () => void
-}
-
-export function ModalHeader ({ title, handleClose }: ModalHeaderProps) {
+export function ModalHeader ({ title, handleClose }) {
     return (
         <div className="flex justify-between items-center">
             <h1 className="text-darkBlue text-2xl font-bold">{title}</h1>

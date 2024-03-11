@@ -1,64 +1,96 @@
 import { useEffect, useState } from "react";
-import { Layout } from "../components/Layout"
-import LectureSearch from "../components/Lecture/LectureSearch";
-import LessonModal from "../components/Lecture/LessonModal";
-import { Plus } from "lucide-react";
-import { sendEvent } from "../../utils/api";
-import toast from "react-hot-toast";
-import Pagination from "../components/Pagination";
-import LectureCard from "../components/Lecture/LectureCard/LectureCard";
+import { Layout } from "../components/Layout";
 import { useRefreshStore } from "../store";
+import Pagination from "../components/Pagination";
+import toast from "react-hot-toast";
+import { sendEvent } from "../utils/event";
+import { Plus } from "lucide-react";
+import LessonModal from "../components/Lecture/LessonModal";
+import LectureCard from "../components/Lecture/LectureCard/LectureCard";
 
 export default function Lessons () {
-
-    const lesson = useRefreshStore((state: any) => state.lesson);
-    const setLesson = useRefreshStore((state: any) => state.setLesson);
-
     const lecture = useRefreshStore((state: any) => state.lecture);
     const setLecture = useRefreshStore((state: any) => state.setLecture);
 
-    const [notPayed, setNotPayed] = useState(0);
-
-    const [isOpen, setOpen] = useState(false);
-    const [lecturesData, setLecturesData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [lectures, setLectures] = useState([]);
+    const [isOpen, setOpen] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [perPage, setPerPage] = useState(20);
+    const [perPage, setPerPage] = useState(10);
+    const [max, setMax] = useState(1);
 
-    const lastIndex = currentPage * perPage;
-    const firstIndex = lastIndex - perPage;
+    const [query, setQuery] = useState("");
+    const [total, setTotal] = useState(0);
+    const [showPagination, setShowPagination] = useState(true);
+    const [debt, setDebt] = useState(0);
 
-    const currentLectures = lecturesData.slice(firstIndex, lastIndex);
-
-    useEffect(() => {
-        setCurrentPage(1);
-        let notPayed = lecturesData.filter((item) => !item.payed);
-        setNotPayed(notPayed.length);
-    }, [lecturesData]);
+    async function handleSearch () {
+        if (query.trim().length !== 0) {
+            setShowPagination(false);
+            try {
+                setCurrentPage(1);
+                const data: any = await sendEvent("find-lectures-by-student-name", query);
+                setLectures(data);
+            } catch (error) {
+                toast.error("Busca com problemas...");
+            }
+        }
+    }
 
     useEffect(() => {
         async function fetch () {
             try {
-                const data: any = await sendEvent("find-all-lectures-sorted-by-date");
-                setLecturesData(data);
-                setCurrentPage(1);
+                const total: any = await sendEvent("count-lectures");
+                setTotal(total);
+                setMax(Math.ceil(total/perPage));
             } catch (error) {
-                toast.error("Algo deu errado");
-            } finally {
-                setLesson(false);
-                setLecture(false);
-                setLoading(false);
+                console.log(error);
+                setTotal(10);
             }
         }
 
         fetch();
-    }, [lesson, lecture])
+    }, [])
+
+    useEffect(() => {
+        async function fetch () {
+            try {
+                const data: any = await sendEvent("find-all-lectures", currentPage, perPage);
+                setLectures(data.lectures);
+                setDebt(data.debt);
+            } catch (error) {
+                toast.error("Algo deu errado");
+            } finally {
+                setLoading(false);
+                setLecture(false);
+            }
+        }
+
+        if (query === "") {
+            setShowPagination(true);
+            fetch();
+        }
+    }, [lecture, currentPage, query])
 
     return (
         <Layout.Root>
             <Layout.Header>
-                <LectureSearch setSearchResults={setLecturesData}/>
+                <div className="flex">
+                    <div className="flex items-center gap-10">
+                        <div>
+                            <input 
+                                className="p-2 border-2 border-darkBlue focus:border-darkBlue placeholder:text-slate-600 text-slate-600 font-bold"
+                                type="text" 
+                                placeholder="Buscar aulas" 
+                                onChange={(event) => setQuery(event.target.value)}
+                            />
+                        </div>
+                        <button className="py-2 px-4 flex gap-5 items-center bg-darkBlue shadow-sm shadow-slate-400 rounded-sm" onClick={handleSearch}>
+                            <h2 className="text-white font-bold text-lg">Buscar</h2>
+                        </button>
+                    </div>
+                </div>
                 <div>
                     <button className="py-2 px-4 flex gap-5 items-center bg-lightRed shadow-sm shadow-slate-400 rounded-sm" onClick={() => setOpen(true)}>
                         <Plus color="white"/>
@@ -70,27 +102,40 @@ export default function Lessons () {
                     <div className="bg-primaryBlue rounded-sm py-2 px-4 shadow-md shadow-slate-400">
                         {
                             loading ? 
-                                <p>Carregando...</p>
+                                <p className="text-white text-xl font-bold">Carregando...</p>
                             :
-                                <h1 className="text-white text-xl font-bold">{notPayed} pagamento(s) pendente(s)</h1>
+                                <h1 className="text-white text-xl font-bold">{debt} Pagamento(s) pendente(s)</h1>
                         }
                     </div>
                 </div>
             </Layout.Header>
             <Layout.Content>
-            <div className="h-full flex flex-col gap-3">
+                <div className="h-full flex flex-col gap-4">
                     <h1 className="text-2xl font-bold text-slate-800 text-center">Aulas</h1>
-                    <div className="h-5/6 w-full items-center overflow-y-auto p-2 flex flex-col content-center">
+                    <div className="h-5/6 w-full overflow-y-auto p-2">
                         {
-                            currentLectures.map((lecture, index) => {
-                                return (
-                                    <LectureCard key={index} lecture={lecture}/>
-                                )
-                            })
+                            lectures.length !== 0 ? 
+                                <>
+                                    <h2 className="text-darkBlue text-lg font-bold text-center">Busque aulas pelo nome do aluno</h2>
+                                    {
+                                        lectures.map((data, index) => {
+                                            return (
+                                                <LectureCard lecture={data} key={index}/>
+                                            )
+                                        })
+                                    }
+                                </>
+                            :
+                                <h2 className="text-darkBlue text-xl font-bold text-center">Nenhuma aula encontrada!</h2>
                         }
                     </div>
                     <div className="flex justify-center my-3">
-                        <Pagination totalData={lecturesData.length} perPage={perPage} setCurrentPage={setCurrentPage} currentPage={currentPage}/>
+                        {
+                            showPagination ?
+                                <Pagination currentPage={currentPage} max={max} setCurrentPage={setCurrentPage}/>
+                            :
+                                <></>
+                        }
                     </div>
                 </div>
             </Layout.Content>

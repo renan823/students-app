@@ -1,48 +1,53 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../../Modal";
-import { Phone, User } from "../../../intefaces";
 import { useForm } from "react-hook-form";
 import Field from "../../Field";
 import Select from "../../Select";
 import TextArea from "../../TextArea";
-import { addStudent, grades, splitPhones, updateStudent, years } from "./actions";
+import { addStudent, grades, splitGrades, updateStudent, years } from "./actions";
 import { toast } from "react-hot-toast";
 import { useRefreshStore } from "../../../store";
+import { toInputDate } from "../../../utils/date";
 
-interface StudentModalProps {
-    isOpen: boolean,
-    setOpen: Dispatch<SetStateAction<Boolean>>,
-    student: User | null
-    phones: Phone[] | null
-}
-
-export default function StudentModal ({ isOpen, setOpen, student, phones }: StudentModalProps) {
+export default function StudentModal ({ isOpen, setOpen, student }) {
     const setStudent = useRefreshStore((state: any) => state.setStudent);
 
     const [action, setAction] = useState("create");
 
-    const { control, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm<User>();
+    const [values, setValues] = useState({ 
+        name: "", 
+        lastName: "",
+        motherName: "",
+        bornDate: "",
+        cpf: "",
+        gradeType: "",
+        gradeYear: "",
+        phone1: "",
+        phone2: "",
+        observation: ""
+    })
 
-    async function onSubmit (data: User) {
+    const { control, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm();
+
+    async function onSubmit (data) {
         if (action === "create") {
-            let result = await addStudent(data);
+            const result = await addStudent(data);
             if (result) {
                 toast.success("Aluno cadastrado");
                 setStudent(true);
                 handleClose();
-            } else {
-                toast.error("Algo deu errado");
-            }
+                return;
+            } 
         } else if (action === "update") {
-            let result = await updateStudent(data, phones);
+            const result = await updateStudent({...student, ...data});
             if (result) {
-                toast.success("Dados atualizados");
+                toast.success("Dados alterados");
                 setStudent(true);
                 handleClose();
-            } else {
-                toast.error("Algo deu errado");
-            }
+                return;
+            } 
         }
+        toast.error("Algo deu errado");
     }
 
     function handleClose () {
@@ -52,20 +57,21 @@ export default function StudentModal ({ isOpen, setOpen, student, phones }: Stud
 
     useEffect(() => {
         if (student) {
-            let values = {...student};
+            let { cpf, name, lastName, motherName, grade, observation, phones, bornDate } = student;
 
-            let [phone1, phone2] = splitPhones(phones);
+            const { gradeType, gradeYear } = splitGrades(grade);
+            const [phone1, phone2] = phones;
+            bornDate = toInputDate(bornDate);
 
-            values["phone1"] = phone1;
-            values["phone2"] = phone2;
-
-            Object.entries(values).forEach(([key, value]) => {
-                setValue(key as  keyof User, value);
-            })
-
+            setValues({ cpf, name, lastName, motherName, observation, gradeType, gradeYear, phone1, phone2, bornDate });
             setAction("update");
         }
-    }, [student, setValue])
+
+        Object.entries(values).forEach(([key, value]) => {
+            return setValue(`${key}`, value);
+        })
+
+    }, [isOpen, student]);
 
     return (
         <Modal.Root isOpen={isOpen}>
@@ -73,13 +79,14 @@ export default function StudentModal ({ isOpen, setOpen, student, phones }: Stud
             <Modal.Content>
                 <form className="overflow-auto h-96 p-4" onSubmit={handleSubmit(onSubmit)}>
                     <Field name="name" control={control} rules={{ required: true }} label="Nome" error={ errors.name }/>
-                    <Field name="motherName" control={control} rules={{ required: true }} label="Nome da mãe" error={ errors.motherName }/>
+                    <Field name="lastName" control={control} rules={{ required: true }} label="Sobrenome" error={ errors.lastName }/>
+                    <Field name="motherName" control={control} rules={null} label="Nome da mãe" error={ errors.motherName }/>
                     <div className="flex gap-4">
                         <Field name="phone1" control={control} rules={{ required: true, pattern: /^\([1-9]{2}\)\d{4,5}-\d{4}$/ }} label="Telefone" error={ errors.phone1 } type="tel" placeholder="(00)0000-0000"/>
                         <Field name="phone2" control={control} rules={{ required: false, pattern: /^\([1-9]{2}\)\d{4,5}-\d{4}$/ }} label="Telefone" error={ errors.phone2 } type="tel" placeholder="(00)0000-0000"/>
                     </div>
-                    <Field name="bornDate" control={control} rules={{ required: true }} label="Data de nascimento" error={ errors.bornDate } type="date"/>
-                    <Field name="cpf" control={control} rules={{ required: true, pattern: /^\d{3}\.\d{3}\.\d{3}\-\d{2}/ }} label="CPF" error={ errors.cpf } placeholder="XXX.XXX.XXX-XX" readOnly={student ? true : false}/>
+                    <Field name="bornDate" control={control} rules={null} label="Data de nascimento" error={ errors.bornDate } type="date"/>
+                    <Field name="cpf" control={control} rules={{ pattern: /^\d{3}\.\d{3}\.\d{3}\-\d{2}/ }} label="CPF" error={ errors.cpf } placeholder="XXX.XXX.XXX-XX"/>
                     <div className="w-full p-2">
                         <h3 className="font-bold text-lg">Série</h3>
                         <div className="flex items-center">

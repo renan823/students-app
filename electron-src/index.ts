@@ -1,18 +1,13 @@
-// Native
 import { join } from "path";
 import { format } from "url";
 
-// Packages
 import { BrowserWindow, app, ipcMain } from "electron";
 import isDev from "electron-is-dev";
 import prepareNext from "electron-next";
 
-//Controllers
-import UserDAO from "../api/repositories/UserDAO";
-import LessonDAO from "../api/repositories/LessonDAO";
-import LectureDAO from "../api/repositories/LectureDAO";
+import StudentDAO from "./api/repositories/StudentDAO";
+import LectureDAO from "./api/repositories/LectureDAO";
 
-// Prepare the renderer once the app is ready
 app.on("ready", async () => {
     await prepareNext("./renderer");
 
@@ -35,80 +30,43 @@ app.on("ready", async () => {
       	});
 
 	mainWindow.maximize();
-	mainWindow.removeMenu();
+	//mainWindow.removeMenu();
   	mainWindow.loadURL(url);
 });
 
-// Quit the app once all windows are closed
 app.on("window-all-closed", app.quit);
 
-//user events 
-const userDAO = new UserDAO();
-
-const lessonDAO = new LessonDAO();
-
+const studentDAO = new StudentDAO();
 const lectureDAO = new LectureDAO();
 
-// Manipuladores de eventos para operações de usuário
-ipcMain.on("create-user", (event, data) => {
-    userDAO.create(event, data).catch(error => console.error(error));
-});
+//Students
+ipcMain.on("add-student", studentDAO.create);
 
-ipcMain.on("update-user", (event, cpf, newData) => {
-    userDAO.update(event, cpf, newData).catch(error => console.error(error));
-});
+ipcMain.on("update-student", studentDAO.update);
 
-ipcMain.on("find-users-by-name", (event, name) => {
-	userDAO.findUserByName(event, name).catch(error => console.error(error));
-});
+ipcMain.on("find-all-students", studentDAO.findAll);
 
-ipcMain.on("find-users-by-mother-name", (event, motherName) => {
-	userDAO.findUserByMotherName(event, motherName).catch(error => console.error(error));
-});
+ipcMain.on("find-students-by-name", studentDAO.findStudentsByName);
 
-ipcMain.on("find-all-students-with-phones-and-debt", (event) => {
-	userDAO.findAllStudentsWithPhonesAndDebt(event).catch(error => console.error(error));
-});
+ipcMain.on("find-students-by-mothername", studentDAO.findStudentsByMotherName);
 
-// Manipuladores de eventos para operações de telefone
-ipcMain.on("create-many-phones", (event, data) => {
-	userDAO.createManyPhones(event, data).catch(error => console.error(error));
-});
+ipcMain.on("find-students-by-name-for-lectures", studentDAO.findByNameForLectures);
 
-ipcMain.on("update-many-phones", (event, data) => {
-	userDAO.updateManyPhones(event, data).catch(error => console.error(error));
-});
+ipcMain.on("count-students", studentDAO.countStudents);
 
-// Manipuladores de eventos para operações de lições
-ipcMain.on("create-lesson", (event, data) => {
-	lessonDAO.create(event, data).catch(error => console.error(error));
-});
+//Lectures
+ipcMain.on("add-lecture", lectureDAO.create);
 
-ipcMain.on("update-lesson", (event, id, newData) => {
-	lessonDAO.update(event, id, newData).catch(error => console.error(error));
-});
+ipcMain.on("update-lecture", lectureDAO.update);
 
-//Manipuladores de eventos para operações de aulas
-ipcMain.on("create-lecture", (event, data) => {
-	lectureDAO.create(event, data).catch(error => console.error(error));
-});
+ipcMain.on("lectures-by-week", lectureDAO.findLecturesByWeek);
 
-ipcMain.on("update-lecture", (event, id, newData) => {
-	lectureDAO.update(event, id, newData).catch(error => console.error(error));
-});
+ipcMain.on("find-all-lectures", lectureDAO.findAll);
 
-ipcMain.on("find-lectures-by-week", (event) => {
-	lectureDAO.findLecturesByWeek(event).catch(error => console.error(error));
-});
+ipcMain.on("lectures-months-ago", lectureDAO.findLecturesByMonthsAgo);
 
-ipcMain.on("find-all-lectures-sorted-by-date", (event, skip, take) => {
-	lectureDAO.findAllLecturesSortedByDate(event, skip, take).catch(error => console.error(error));
-});
+ipcMain.on("find-lectures-by-student-name", lectureDAO.findLecturesByStudentName);
 
-ipcMain.on("find-lectures-last-ten-months", (event) => {
-	lectureDAO.findLecturesLastTenMonths(event).catch(error => console.error(error));
-});
+ipcMain.on("count-lectures", lectureDAO.countLectures);
 
-ipcMain.on("find-lectures-by-student-name", (event, name) => {
-	lectureDAO.findLecturesByStudentName(event, name).catch(error => console.error(error));
-});
+ipcMain.on("sum-lectures-by-day", lectureDAO.sumPaymentsByDay);

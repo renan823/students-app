@@ -1,13 +1,11 @@
-import { sendEvent } from "../../../../utils/api";
+import { sendEvent } from "../../../utils/event";
 
 export async function setPresence (payload) {
     
-    let { id, lesson_id, user_cpf, presence, payed } = payload;
-
-    const lecture = { id, lesson_id, user_cpf, presence: !presence, payed };
+    const lecture = { ...payload, presence: !payload.presence };
 
     try {
-        await sendEvent("update-lecture", lecture.id, lecture);
+        await sendEvent("update-lecture", lecture);
         return true;
     } catch (error) {
         return false;
@@ -15,13 +13,11 @@ export async function setPresence (payload) {
 }
 
 export async function setPayed (payload) {
-    
-    let { id, lesson_id, user_cpf, presence, payed } = payload;
 
-    const lecture = { id, lesson_id, user_cpf, presence, payed: !payed };
+    const lecture = { ...payload, payed: !payload.payed };
 
     try {
-        await sendEvent("update-lecture", lecture.id, lecture);
+        await sendEvent("update-lecture", lecture);
         return true;
     } catch (error) {
         return false;
@@ -29,21 +25,17 @@ export async function setPayed (payload) {
 }
 
 export async function updateLecture (lecture, lesson) {
+
     lesson.startAt = new Date(lesson.startAt).toISOString();
     lesson.endAt = new Date(lesson.endAt).toISOString();
+    lesson.value = parseFloat(`${lesson.value}`);
+
+    lecture.lesson = lesson;
 
     try {
-        await sendEvent("update-lesson", lesson.id, lesson);
-
-        try {
-            await sendEvent("update-lecture", lecture.id, lecture);
-
-            return true;
-        } catch (error) {
-            return false;
-        }
+        await sendEvent("update-lecture", lecture);
+        return true;
     } catch (error) {
-        console.log(error)
         return false;
     }
 }

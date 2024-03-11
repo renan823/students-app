@@ -1,10 +1,10 @@
 import { useState } from "react"
-import LectureModal from "../LectureModal";
-import { getDay, getTime } from "../../../../utils/date";
+import { getDay, getTime } from "../../../utils/date";
 import { CheckCircle, XCircle } from "lucide-react";
 import { setPayed, setPresence } from "../LectureModal/actions";
 import { toast } from "react-hot-toast";
 import { useRefreshStore } from "../../../store";
+import LectureModal from "../LectureModal";
 
 export function LectureCardHeader ({ student, lesson }) {
     return (
@@ -39,23 +39,27 @@ export default function LectureCard ({ lecture }) {
 
     const [isOpen, setOpen] = useState(false);
 
-    const { user, lesson } = lecture;
+    const { student, lesson } = lecture;
 
     async function handlePayed () {
         try {
-            await setPayed(lecture);
-            setLecture(true);
+            let result = await setPayed(lecture);
+            if (result) {
+                setLecture(true)
+            }
         } catch (error) {
-            toast.error("Erro ao atualizar")
+            toast.error("Erro ao atualizar");
         }
     }
 
     async function handlePresence () {
         try {
-            await setPresence(lecture);
-            setLecture(true);
+            let result = await setPresence(lecture);
+            if (result) {
+                setLecture(true)
+            }
         } catch (error) {
-            toast.error("Erro ao atualizar")
+            toast.error("Erro ao atualizar");
         }
     }
 
@@ -65,7 +69,7 @@ export default function LectureCard ({ lecture }) {
                 <div className="bg-primaryBlue flex w-full items-center justify-between rounded-md p-3">
                     <div className="w-1/2">
                         <button className="w-full" onClick={() => setOpen(!isOpen)}>
-                            <LectureCardHeader student={user} lesson={lesson}/>
+                            <LectureCardHeader student={student} lesson={lesson}/>
                         </button>
                     </div>
                     <div>

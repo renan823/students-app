@@ -1,44 +1,19 @@
-import { sendEvent } from "../../../../utils/api";
-import { Lesson, User } from "../../../intefaces";
+import { v4 as uuidv4 } from "uuid";
+import { sendEvent } from "../../../utils/event";
+import dayjs from "dayjs";
 
-export async function addLesson (lesson: Lesson, student: User) {
-    const user_cpf = student.cpf;
+export async function addLecture (lesson, student) {
 
-    lesson.startAt = new Date(lesson.startAt).toISOString();
-    lesson.endAt = new Date(lesson.endAt).toISOString();
+    lesson.startAt = dayjs(lesson.startAt).toISOString();
+    lesson.endAt = dayjs(lesson.endAt).toISOString();
+    lesson.value = parseInt(`${lesson.value}`);
+
+    const lecture = { studentId: student._id, lesson, payed: false, presence: false, _id: uuidv4() };
 
     try {
-        const result: any = await sendEvent("create-lesson", lesson);
-        if (result) {
-            const lecture = { user_cpf, lesson_id: result.id, payed: false, presence: false };
-            await sendEvent("create-lecture", lecture);
-
-            return true;
-        }
+        await sendEvent("add-lecture", lecture);
+        return true;
     } catch (error) {
         return false;
     }
 }
-
-/**
- 
-const handleEditLecture = async (data, setLessons, setLectures) => {
-    let { newLesson, newLecture } = data;
-
-    newLesson.startAt = new Date(newLesson.startAt).toISOString();
-    newLesson.endAt = new Date(newLesson.endAt).toISOString();
-
-    try {
-        await sendEvent("update-lesson", newLesson.id, newLesson);
-        try {
-            await sendEvent("update-lecture", newLecture.id, newLecture);
-            toast.success("Dados alterados");
-            fetchData(null, null, setLessons, setLectures);
-        } catch (error) {
-            toast.error("Algo deu errado");
-        }
-    } catch (error) {
-        toast.error("Algo deu errado");
-    }
-}
- */

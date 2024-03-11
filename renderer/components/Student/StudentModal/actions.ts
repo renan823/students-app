@@ -1,10 +1,6 @@
-import { sendEvent } from "../../../../utils/api";
-import { Phone, User } from "../../../intefaces";
-
-interface AddStudentProps {
-    student: User
-    phones: string[]
-}
+import dayjs from "dayjs";
+import { sendEvent } from "../../../utils/event";
+import { v4 as uuidv4 } from "uuid";
 
 export const grades = [{ value: "E.F.", text: "E.F." }, { value: "E.M.", text: "E.M." }];
 
@@ -20,67 +16,51 @@ export function splitGrades (grade: string) {
     return { gradeType, gradeYear };
 }
 
-export function splitPhones (phones: Phone[]) {
-    let result = ["", ""];
 
-    for (let i =0; i < 2; i++) {
-        if (phones[i] && phones[i].number) {
-            result[i] = phones[i].number;
-        }
-    }
-
-    return result;
-}
-
-function createStudentPayload (student: User) {
-    let { name, motherName, bornDate, cpf, observation, gradeYear, gradeType } = student;
-
-    const birthday = new Date(bornDate).toISOString();
-
-    const grade = joinGrades(gradeYear, gradeType);
-
-    return { name, motherName, bornDate: birthday, cpf, grade, observation};
-}
-
-
-export async function addStudent (student: User) {
-    if (!student.phone2) {
-        student.phone2 = "";
-    }
-
-    if (!student.observation) {
-        student.observation = "";
-    }
-
-    const studentPayload = createStudentPayload(student);
-
-    const phones = [student.phone1, student.phone2];
-    const phonesPayload = [];
-
-    phones.forEach(phone => {
-        if (phone.trim().length !== 0) {
-            phonesPayload.push({ number: phone, user_cpf: student.cpf });
+function createStudentPayload (student: any) {
+    Object.entries(student).forEach(([key, value]) => {
+        if (!value) {
+            student[key] = "";
         }
     })
 
+    let { name, lastName, motherName, bornDate, cpf, observation, gradeYear, gradeType } = student;
+
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
+
+    const birthday = dayjs(bornDate).unix();
+
+    const grade = joinGrades(gradeYear, gradeType);
+
+    return { name, lastName, motherName, bornDate: birthday, cpf, grade, observation, phones: [student.phone1, student.phone2], _id: student._id ?? "" };
+}
+
+
+export async function addStudent (student: any) {
+    let payload = createStudentPayload(student);
+    
+    if (student._id) {
+        payload._id = student._id;
+    } else {
+        payload._id = uuidv4();
+    }
+
     try {
-        await sendEvent("create-user", studentPayload);
-        await sendEvent("create-many-phones", phonesPayload);
+        await sendEvent("add-student", payload);
         return true;
     } catch (error) {
-        console.log(error);
         return false;
     }
 }
 
-export async function updateStudent (student: User, phones: Phone[]) {
-    const studentPayload = createStudentPayload(student);
+export async function updateStudent (student: any) {
+    let data = createStudentPayload(student);
 
-    console.log(studentPayload, phones);
+    const payload = {...data, _rev: student._rev}
 
     try {
-        await sendEvent("update-user", student.cpf, studentPayload);
-        await sendEvent("update-many-phones", phones);
+        await sendEvent("update-student", payload);
         return true;
     } catch {
         return false;
