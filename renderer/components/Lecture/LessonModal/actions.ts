@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 export async function addLecture (lesson, student) {
 
     lesson.startAt = dayjs(lesson.startAt).toISOString();
-    lesson.endAt = dayjs(lesson.endAt).toISOString();
+    lesson.endAt = dayjs(lesson.startAt).add(parseInt(`${lesson.duration}`), "hours").toISOString();
     lesson.value = parseInt(`${lesson.value}`);
 
     const lecture = { studentId: student._id, lesson, payed: false, presence: false, _id: uuidv4() };

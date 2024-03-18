@@ -8,13 +8,14 @@ import Field from "../../Field";
 import { Modal } from "../../Modal";
 import Checkbox from "../../Checkbox";
 import { toInputDatetime } from "../../../utils/date";
+import dayjs from "dayjs";
 
 export default function LectureModal ({ isOpen, setOpen, lecture }) {
     const setLecture = useRefreshStore((state: any) => state.setLecture);
 
     const [values, setValues]: [any, any]  = useState({ 
         startAt: "",
-        endAt: "",
+        duration: "",
         value: "",
         payed: "",
         presence: ""
@@ -34,7 +35,7 @@ export default function LectureModal ({ isOpen, setOpen, lecture }) {
             lecture.payed = data.payed;
             lecture.presence = data.presence;
 
-            let lesson = { startAt: data.startAt, endAt: data.endAt, value: data.value };
+            let lesson = { startAt: data.startAt, duration: data.duration, value: data.value };
 
             const result = await updateLecture(lecture, lesson);
             if (result) {
@@ -92,9 +93,9 @@ export default function LectureModal ({ isOpen, setOpen, lecture }) {
             let { startAt, value, endAt } = lesson;
 
             startAt = toInputDatetime(startAt);
-            endAt = toInputDatetime(endAt);
+            let duration = dayjs(endAt).diff(dayjs(startAt), "hours");
 
-            setValues({ startAt, endAt, value, presence, payed });
+            setValues({ startAt, duration, value, presence, payed });
             setSelected(student);
         }
 
@@ -143,8 +144,8 @@ export default function LectureModal ({ isOpen, setOpen, lecture }) {
                         <h3 className="font-bold text-lg">Aluno: {selected ? selected.name : "selecione um aluno!"}</h3>
                     </div>
                     <Field name="startAt" control={control} rules={{ required: true }} error={ errors.startAt } label="Início da aula" type="datetime-local"/>
-                    <Field name="endAt" control={control} rules={{ required: true }} error={ errors.endAt } label="Fim da aula" type="datetime-local"/>
-                    <Field name="value" control={control} rules={{ required: true }} error={ errors.value } label="Valor da aula" type="number" step={5}/>
+                    <Field name="duration" control={control} rules={{ required: true }} error={ errors.duration } label="Duração da aula" type="number" step={1} min={0}/>
+                    <Field name="value" control={control} rules={{ required: true }} error={ errors.value } label="Valor da aula" type="number" step={5} min={0}/>
                     <Checkbox name="payed" control={control} error={ errors.payed } label="Aula paga?" checked={values.payed}/>
                     <Checkbox name="presence" control={control} error={ errors.presence } label="Aluno presente?" checked={values.presence}/>
                     <div className="flex w-full p-2 justify-end">

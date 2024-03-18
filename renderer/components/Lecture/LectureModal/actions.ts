@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { sendEvent } from "../../../utils/event";
 
 export async function setPresence (payload) {
@@ -27,7 +28,7 @@ export async function setPayed (payload) {
 export async function updateLecture (lecture, lesson) {
 
     lesson.startAt = new Date(lesson.startAt).toISOString();
-    lesson.endAt = new Date(lesson.endAt).toISOString();
+    lesson.endAt = dayjs(lesson.startAt).add(parseInt(`${lesson.duration}`), "hours").toISOString();
     lesson.value = parseFloat(`${lesson.value}`);
 
     lecture.lesson = lesson;

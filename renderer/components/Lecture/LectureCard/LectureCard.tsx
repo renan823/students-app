@@ -7,6 +7,8 @@ import { useRefreshStore } from "../../../store";
 import LectureModal from "../LectureModal";
 
 export function LectureCardHeader ({ student, lesson }) {
+
+    console.log(lesson)
     return (
         <div className="bg-darkBlue py-2 px-4 rounded-md w-full flex items-center">
             <div className="w-1/2 border-r-2 border-r-white px-3 flex items-center">

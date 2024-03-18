@@ -12,7 +12,7 @@ export default function LessonModal ({ isOpen, setOpen }) {
 
     const [values, setValues] = useState({ 
         startAt: "",
-        endAt: "",
+        duration: "",
         value: ""
     })
 
@@ -111,8 +111,8 @@ export default function LessonModal ({ isOpen, setOpen }) {
                         <h3 className="font-bold text-lg">Aluno: {selected ? selected.name : "selecione um aluno!"}</h3>
                     </div>
                     <Field name="startAt" control={control} rules={{ required: true }} error={ errors.startAt } label="Início da aula" type="datetime-local"/>
-                    <Field name="endAt" control={control} rules={{ required: true }} error={ errors.endAt } label="Fim da aula" type="datetime-local"/>
-                    <Field name="value" control={control} rules={{ required: true }} error={ errors.value } label="Valor da aula" type="number" step={5}/>
+                    <Field name="duration" control={control} rules={{ required: true }} error={ errors.duration } label="Duração da aula" type="number" step={1} min={0}/>
+                    <Field name="value" control={control} rules={{ required: true }} error={ errors.value } label="Valor da aula" type="number" step={5} min={0}/>
                     <div className="flex w-full p-2 justify-end">
                         <button className="flex font-bold text-lg text-white px-8 py-2 rounded-md bg-darkBlue" type="submit">{ isSubmitting ? "Enviando" : "Salvar" }</button>
                     </div>
