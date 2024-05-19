@@ -8,6 +8,7 @@ const url_1 = require("url");
 const electron_1 = require("electron");
 const electron_is_dev_1 = __importDefault(require("electron-is-dev"));
 const electron_next_1 = __importDefault(require("electron-next"));
+const StudentController_1 = __importDefault(require("./api/controllers/StudentController"));
 electron_1.app.on("ready", async () => {
     await (0, electron_next_1.default)("./renderer");
     const mainWindow = new electron_1.BrowserWindow({
@@ -31,3 +32,11 @@ electron_1.app.on("ready", async () => {
     mainWindow.loadURL(url);
 });
 electron_1.app.on("window-all-closed", electron_1.app.quit);
+const studentController = new StudentController_1.default();
+electron_1.ipcMain.on("add-student", studentController.addStudent);
+electron_1.ipcMain.on("update-student", studentController.updateStudent);
+electron_1.ipcMain.on("find-all-students", studentController.findAllStudents);
+electron_1.ipcMain.on("find-students-by-name", studentController.findStudentsByName);
+electron_1.ipcMain.on("find-students-by-mothername", studentController.findStudentsByMotherName);
+electron_1.ipcMain.on("find-students-in-debt", studentController.findStudentsInDebt);
+electron_1.ipcMain.on("count-students", studentController.countStudents);

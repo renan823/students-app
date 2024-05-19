@@ -46,3 +46,7 @@ ipcMain.on("find-all-students", studentController.findAllStudents);
 ipcMain.on("find-students-by-name", studentController.findStudentsByName);
 
 ipcMain.on("find-students-by-mothername", studentController.findStudentsByMotherName);
+
+ipcMain.on("find-students-in-debt", studentController.findStudentsInDebt);
+
+ipcMain.on("count-students", studentController.countStudents);

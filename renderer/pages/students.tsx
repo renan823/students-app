@@ -9,8 +9,8 @@ import Pagination from "../components/Pagination";
 import store from "../utils/store";
 
 export default function Students () {
-    const student = store.getState().refreshStudents;
-    const setStudent = store.getState().setStudents;
+    const student = store().refreshStudents;
+    const setStudent = store().setStudents;
 
     const [loading, setLoading] = useState(true);
     const [students, setStudents] = useState([]);
@@ -43,8 +43,8 @@ export default function Students () {
         } 
 
         try {
-            const data: any = await sendEvent(`find-students-${search}`, value);
-            setStudents(data);
+            const { students }: any = await sendEvent(`find-students-${search}`, value);
+            setStudents(students);
         } catch (error) {
             toast.error("Busca com problemas...");
         }
@@ -53,7 +53,7 @@ export default function Students () {
     useEffect(() => {
         async function fetch () {
             try {
-                const total: any = await sendEvent("count-students");
+                const { total }: any = await sendEvent("count-students");
                 setTotal(total);
                 setMax(Math.ceil(total/perPage));
             } catch (error) {
@@ -67,8 +67,8 @@ export default function Students () {
     useEffect(() => {
         async function fetch () {
             try {
-                const data: any = await sendEvent("find-all-students", currentPage, perPage);
-                setStudents(data.students);
+                const { students }: any = await sendEvent("find-all-students", currentPage, perPage);
+                setStudents(students);
             } catch (error) {
                 toast.error("Algo deu errado");
             } finally {

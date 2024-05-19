@@ -10,7 +10,7 @@ import Select from "../../Forms/Select";
 import TextArea from "../../Forms/TextArea";
 
 export default function StudentModal ({ isOpen, setOpen, student }) {
-    const setStudent = store.getState().setStudents;
+    const setStudent = store().setStudents
 
     const [action, setAction] = useState("create");
 

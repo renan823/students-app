@@ -128,7 +128,10 @@ class StudentService {
             const lectureService = new LectureService_1.default();
             for (const student of result) {
                 const lectures = await lectureService.findLecturesByStudentId(student._id);
-                const debtAmount = lectures.map((lecture) => lecture.payed ? 0 : lecture.lesson.value).reduce((total, debt) => total + debt);
+                let debtAmount = 0;
+                if (lectures.length !== 0) {
+                    debtAmount = lectures.map((lecture) => lecture.payed ? 0 : lecture.lesson.value).reduce((total, debt) => total + debt);
+                }
                 students.push({ student, debtAmount });
             }
             return students;

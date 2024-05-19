@@ -21,10 +21,10 @@ class StudentController {
         try {
             const studentService = new StudentService_1.default();
             const updatedStudent = await studentService.updateStudent(student);
-            return event.reply("add-student-success", { student: updatedStudent });
+            return event.reply("update-student-success", { student: updatedStudent });
         }
         catch (error) {
-            return event.reply("add-student-error", { message: error.message || "Algo deu errado" });
+            return event.reply("update-student-error", { message: error.message || "Algo deu errado" });
         }
     }
     async findAllStudents(event, currentPage, perPage) {
@@ -38,7 +38,7 @@ class StudentController {
             return event.reply("find-all-students-error", { message: error.message || "Algo deu errado" });
         }
     }
-    async findStudenstByName(event, name) {
+    async findStudentsByName(event, name) {
         try {
             const studentService = new StudentService_1.default();
             const result = await studentService.findStudentsByName(name);
@@ -49,7 +49,7 @@ class StudentController {
             return event.reply("find-students-by-name-error", { message: error.message || "Algo deu errado" });
         }
     }
-    async findStudenstByMotherName(event, name) {
+    async findStudentsByMotherName(event, name) {
         try {
             const studentService = new StudentService_1.default();
             const result = await studentService.findStudentsByMotherName(name);
