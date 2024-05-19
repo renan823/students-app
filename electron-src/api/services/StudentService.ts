@@ -10,7 +10,7 @@ class StudentService {
         this.database = new PouchDB("students");
     };
 
-    private sortStudentByName (students: PouchDB.Find.FindResponse<{}>) {
+    private sortStudentByName (students: PouchDB.Find.FindResponse<{}>): PouchDB.Core.ExistingDocument<{}>[] {
         return students.docs.sort((a: any, b: any): any => a.name.localeCompare(b.name));
     }
 
@@ -66,7 +66,7 @@ class StudentService {
         }
     }
 
-    async findStudentByName (name: string) {
+    async findStudentsByName (name: string) {
         try {
             const result = await this.database.find({
                 selector: {
@@ -113,6 +113,23 @@ class StudentService {
             return doc_count;
         } catch (error: any) {
             throw new Error("Erro ao contar alunos");
+        }
+    }
+
+    async joinWithDebts (result: PouchDB.Core.ExistingDocument<{}>[]) {
+        try {
+            let students: any[] = [];
+
+            for (const doc of result) {
+                const student: any = doc;
+                let debtAmount = 0;
+
+                students.push({ student, debtAmount });
+            }
+
+            return students;
+        } catch (error: any) {
+            throw new Error("Erro ao buscar alunos");
         }
     }
 }
