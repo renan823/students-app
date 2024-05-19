@@ -24,9 +24,9 @@ class StudentController {
 
             const updatedStudent = await studentService.updateStudent(student);
 
-            return event.reply("add-student-success", { student: updatedStudent });
+            return event.reply("update-student-success", { student: updatedStudent });
         } catch (error: any) {
-            return event.reply("add-student-error", { message: error.message || "Algo deu errado" });
+            return event.reply("update-student-error", { message: error.message || "Algo deu errado" });
         }
     }
 
@@ -44,7 +44,7 @@ class StudentController {
         }
     }
 
-    async findStudenstByName (event: IpcMainEvent, name: string) {
+    async findStudentsByName (event: IpcMainEvent, name: string) {
         try {
             const studentService = new StudentService();
 
@@ -58,7 +58,7 @@ class StudentController {
         }
     }
 
-    async findStudenstByMotherName (event: IpcMainEvent, name: string) {
+    async findStudentsByMotherName (event: IpcMainEvent, name: string) {
         try {
             const studentService = new StudentService();
 

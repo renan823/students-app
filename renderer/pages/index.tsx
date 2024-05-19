@@ -1,7 +1,14 @@
+import { Layout } from "../components/Layout";
+
 export default function Index () {
 	return (
-		<div>
-			<h1 className="text-lg text-purple-900 text-center">hi!</h1>
-		</div>
+		<Layout.Root>
+			<Layout.Header>
+				<h1>Oi!</h1>
+			</Layout.Header>
+			<Layout.Content>
+				<h1>Pagina bonita</h1>
+			</Layout.Content>
+		</Layout.Root>
 	)
 }
