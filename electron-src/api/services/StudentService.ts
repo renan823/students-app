@@ -4,19 +4,19 @@ PouchDB.plugin(require('pouchdb-find'));
 
 class StudentService {
 
-    private database: PouchDB.Database;
+    private database: PouchDB.Database<Student>;
 
     constructor () {
-        this.database = new PouchDB("students");
+        this.database = new PouchDB<Student>("students");
     };
 
-    private sortStudentByName (students: PouchDB.Find.FindResponse<{}>): PouchDB.Core.ExistingDocument<{}>[] {
+    private sortStudentByName (students: PouchDB.Find.FindResponse<Student>): PouchDB.Core.ExistingDocument<Student>[] {
         return students.docs.sort((a: any, b: any): any => a.name.localeCompare(b.name));
     }
 
     async addStudent (student: Student) {
         try {
-            const result = await this.database.put(student);
+            const result = await this.database.put<Student>(student);
 
             return result;
         } catch (error: any) {
@@ -26,8 +26,8 @@ class StudentService {
 
     async updateStudent (student: Student) {
         try {
-            const doc = await this.database.get(student._id);
-            const result = await this.database.put({
+            const doc = await this.database.get<Student>(student._id);
+            const result = await this.database.put<Student>({
                 _rev: doc._rev,
                 ...student
             });
@@ -40,7 +40,7 @@ class StudentService {
 
     async findStudentById (id: string) {
         try {
-            const student = await this.database.get(id);
+            const student: Student = await this.database.get<Student>(id);
 
             return student;
         } catch (error: any) {
@@ -52,7 +52,7 @@ class StudentService {
         try {
             const skip = (currentPage -1) * perPage;
 
-            const result = await this.database.find({
+            const students: PouchDB.Find.FindResponse<Student> = await this.database.find({
                 selector: {
                     _id: undefined
                 },
@@ -60,7 +60,7 @@ class StudentService {
                 limit: perPage,
             });
 
-            return this.sortStudentByName(result);
+            return this.sortStudentByName(students);
         } catch (error: any) {
             throw new Error("Erro ao buscar alunos");
         }
@@ -68,7 +68,7 @@ class StudentService {
 
     async findStudentsByName (name: string) {
         try {
-            const result = await this.database.find({
+            const result: PouchDB.Find.FindResponse<Student> = await this.database.find({
                 selector: {
                     name: {
                         $regex: `.*${name.charAt(0).toUpperCase() + name.slice(1)}.*`
@@ -84,7 +84,7 @@ class StudentService {
 
     async findStudentsByMotherName (name: string) {
         try {
-            const result = await this.database.find({
+            const result: PouchDB.Find.FindResponse<Student> = await this.database.find({
                 selector: {
                     motherName: {
                         $regex: `.*${name.charAt(0).toUpperCase() + name.slice(1)}.*`

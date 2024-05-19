@@ -10,3 +10,25 @@ export type Student = {
     phones: string[],
     bornDate?: string,
 }
+
+type Lesson = {
+    startAt: string,
+    endAt: string,
+    value: number
+}
+
+export type Event = {
+    _id: string,
+    initialDate: string,
+    repeat: boolean[]
+}
+
+export type Lecture = {
+    _id: string,
+    studentId: string,
+    payed: boolean,
+    presence: boolean,
+    lesson: Lesson
+    fromEvent: boolean,
+    event: Event | null;
+}
