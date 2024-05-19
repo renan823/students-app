@@ -2,6 +2,7 @@ export type Student = {
     _id: string,
     cpf?: string,
     name: string,
+    lastName: string,
     motherName?: string,
     observation?: string,
     grade?: string,
