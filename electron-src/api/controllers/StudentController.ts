@@ -77,7 +77,7 @@ class StudentController {
             const studentService = new StudentService();
 
             const students = await studentService.findStudentsInDebt();
-
+            
             return event.reply("find-students-in-debt-success", { students });
         } catch (error: any) {
             return event.reply("find-students-in-debt-error", { message: error.message || "Algo deu errado" });

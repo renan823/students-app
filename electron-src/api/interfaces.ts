@@ -1,5 +1,3 @@
-//nothing to see here
-
 export type Student = {
     _id: string,
     cpf?: string,
@@ -11,7 +9,7 @@ export type Student = {
     bornDate?: string,
 }
 
-type Lesson = {
+export type Lesson = {
     startAt: string,
     endAt: string,
     value: number

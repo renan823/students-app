@@ -1,17 +1,18 @@
 import PouchDB from "pouchdb";
-import { Student } from "../interfaces";
+import { Lecture, Student } from "../interfaces";
+import LectureService from "./LectureService";
 PouchDB.plugin(require('pouchdb-find'));
 
 class StudentService {
 
     private database: PouchDB.Database<Student>;
-
+   
     constructor () {
         this.database = new PouchDB<Student>("students");
     };
 
     private sortStudentByName (students: PouchDB.Find.FindResponse<Student>): PouchDB.Core.ExistingDocument<Student>[] {
-        return students.docs.sort((a: any, b: any): any => a.name.localeCompare(b.name));
+        return students.docs.sort((s1: Student, s2: Student) => s1.name.localeCompare(s2.name));
     }
 
     async addStudent (student: Student) {
@@ -100,6 +101,26 @@ class StudentService {
 
     async findStudentsInDebt () {
         try {
+            const students = new Map<string, { student: Student, debtAmount: number }>;
+            const lectureService = new LectureService();
+
+            const lectures = await lectureService.findLecturesByDebt();
+
+            if (lectures && lectures.length !== 0) {
+                for (const lecture of lectures) {
+                    const student = await this.findStudentById(lecture.studentId);
+
+                    const debt = students.get(lecture.studentId)?.debtAmount || 0;
+
+                    students.set(lecture.studentId, { student, debtAmount: debt + lecture.lesson.value });
+                }
+
+                const result: { student: Student, debtAmount: number }[] = [];
+                students.forEach((value) => result.push(value));
+
+                return result;
+            }
+
             return [];
         } catch (error: any) {
             throw new Error("Erro ao buscar alunos");
@@ -116,13 +137,15 @@ class StudentService {
         }
     }
 
-    async joinWithDebts (result: PouchDB.Core.ExistingDocument<{}>[]) {
+    async joinWithDebts (result: PouchDB.Core.ExistingDocument<Student>[]) {
         try {
-            let students: any[] = [];
+            const students: { student: Student, debtAmount: number }[] = [];
+            const lectureService = new LectureService();
 
-            for (const doc of result) {
-                const student: any = doc;
-                let debtAmount = 0;
+            for (const student of result) {
+                const lectures = await lectureService.findLecturesByStudentId(student._id);
+
+                const debtAmount = lectures.map((lecture: Lecture) => lecture.payed ? 0 : lecture.lesson.value).reduce((total, debt) => total + debt);
 
                 students.push({ student, debtAmount });
             }

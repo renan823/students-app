@@ -13,6 +13,7 @@
     "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json"
   },
   "dependencies": {
+    "dayjs": "^1.11.11",
     "electron-is-dev": "^1.2.0",
     "electron-next": "^3.1.5",
     "pouchdb": "^8.0.1",
