@@ -2,6 +2,7 @@ import { IpcMainEvent } from "electron";
 import LectureService from "../services/LectureService";
 import { Lecture } from "../interfaces";
 import StudentService from "../services/StudentService";
+import EventService from "../services/EventService";
 
 class LectureController {
 
@@ -10,8 +11,13 @@ class LectureController {
     async addLecture (event: IpcMainEvent, lecture: Lecture) {
         try {
             const lectureService = new LectureService();
+            const eventService = new EventService();
 
             const createdLecture = await lectureService.addLecture(lecture);
+
+            if (lecture.event && lecture.event.repeat.includes(true)) {
+                await eventService.addEvent(lecture.event);
+            }
 
             return event.reply("add-lecture-success", { lecture: createdLecture });
         } catch (error: any) {
@@ -22,8 +28,13 @@ class LectureController {
     async updateLecture (event: IpcMainEvent, lecture: Lecture) {
         try {
             const lectureService = new LectureService();
+            const eventService = new EventService();
 
             const upadtedLecture = await lectureService.updateLecture(lecture);
+
+            if (lecture.event) {
+                await eventService.updateEvent(lecture.event);
+            }
 
             return event.reply("update-lecture-success", { lecture: upadtedLecture });
         } catch (error: any) {

@@ -6,7 +6,7 @@ PouchDB.plugin(require('pouchdb-find'));
 
 class LectureService {
 
-    private database: PouchDB.Database<Lecture>;
+    private readonly database: PouchDB.Database<Lecture>;
 
     constructor () {
         this.database = new PouchDB<Lecture>("lectures");
