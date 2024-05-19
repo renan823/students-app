@@ -869,6 +869,11 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.text-primaryBlue {
+  --tw-text-opacity: 1;
+  color: rgb(89 63 216 / var(--tw-text-opacity));
+}
+
 .opacity-100 {
   opacity: 1;
 }
