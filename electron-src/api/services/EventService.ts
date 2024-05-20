@@ -1,4 +1,6 @@
+import dayjs from "dayjs";
 import { Event } from "../interfaces";
+import LectureService from "./LectureService";
 
 class EventService {
 
@@ -42,16 +44,66 @@ class EventService {
     }
 
     async findAllEvents () {
+        try {
+            const events = await this.database.find({
+                selector: {
+                    _id: undefined
+                },
+            })
 
+            return events;
+        } catch {
+            throw new Error("Erro ao buscar eventos");
+        }
     }
 
     async findEventById (id: string) {
         try {
-            const event = await this.database.get<Event>(id)
+            const event = await this.database.get<Event>(id);
 
             return event;
         } catch {
             throw new Error("Erro ao buscar evento");
+        }
+    }
+
+    async findNextDate (event: Event) {
+        try {
+            const lectureService = new LectureService();
+
+            const lastLecture = (await lectureService.findLecturesByEventId(event._id))[0];
+
+            const lectureDay = dayjs(lastLecture.lesson.startAt).day();
+
+            const newDay = dayjs(lastLecture.lesson.startAt);
+
+            if (lastLecture.event?.repeat.slice(lectureDay == 6 ? lectureDay : lectureDay + 1).includes(true)) {
+                //only accepts days between 0-6
+                //find the first repeat after the date
+                newDay.add(lastLecture.event?.repeat.slice(lectureDay == 6 ? lectureDay : lectureDay + 1).indexOf(true), "d");
+            } else if (lastLecture.event?.repeat.slice(0, lectureDay).includes(true)) {
+                //find the first repeat before the date
+                newDay.add(1, "w").add(lastLecture.event?.repeat.slice(0, lectureDay).indexOf(true), "d");
+            } else {
+                //the new date is one week after the last date
+                newDay.add(1, "w");
+            }
+
+            return { newDay, lastLecture };
+        } catch (error: any) {
+            throw new Error("Erro ao buscar evento");
+        }
+    }
+
+    async createLectureFromEvent (event: Event) {
+        try {
+            //const lectureService = new LectureService();
+
+            const { newDay, lastLecture } = await this.findNextDate(event);
+
+            console.log("dia", newDay, "ultima aula", lastLecture);
+        } catch (error: any) {
+
         }
     }
 }

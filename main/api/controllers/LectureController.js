@@ -5,13 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const LectureService_1 = __importDefault(require("../services/LectureService"));
 const StudentService_1 = __importDefault(require("../services/StudentService"));
+const EventService_1 = __importDefault(require("../services/EventService"));
 class LectureController {
     constructor() { }
     ;
     async addLecture(event, lecture) {
         try {
             const lectureService = new LectureService_1.default();
+            const eventService = new EventService_1.default();
             const createdLecture = await lectureService.addLecture(lecture);
+            if (lecture.event && lecture.event.repeat.includes(true)) {
+                await eventService.addEvent(lecture.event);
+            }
             return event.reply("add-lecture-success", { lecture: createdLecture });
         }
         catch (error) {
@@ -21,7 +26,11 @@ class LectureController {
     async updateLecture(event, lecture) {
         try {
             const lectureService = new LectureService_1.default();
+            const eventService = new EventService_1.default();
             const upadtedLecture = await lectureService.updateLecture(lecture);
+            if (lecture.event) {
+                await eventService.updateEvent(lecture.event);
+            }
             return event.reply("update-lecture-success", { lecture: upadtedLecture });
         }
         catch (error) {

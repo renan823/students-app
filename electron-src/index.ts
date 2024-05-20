@@ -5,6 +5,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import isDev from "electron-is-dev";
 import prepareNext from "electron-next";
 import StudentController from "./api/controllers/StudentController";
+import LectureController from "./api/controllers/LectureController";
 
 
 app.on("ready", async () => {
@@ -38,15 +39,15 @@ app.on("window-all-closed", app.quit);
 const studentController = new StudentController();
 
 ipcMain.on("add-student", studentController.addStudent);
-
 ipcMain.on("update-student", studentController.updateStudent);
-
 ipcMain.on("find-all-students", studentController.findAllStudents);
-
 ipcMain.on("find-students-by-name", studentController.findStudentsByName);
-
 ipcMain.on("find-students-by-mothername", studentController.findStudentsByMotherName);
-
 ipcMain.on("find-students-in-debt", studentController.findStudentsInDebt);
-
 ipcMain.on("count-students", studentController.countStudents);
+
+
+const lectureController = new LectureController();
+
+ipcMain.on("add-lecture", lectureController.addLecture);
+ipcMain.on("find-lectures-by-week", lectureController.findLecturesByWeek);

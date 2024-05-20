@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const pouchdb_1 = __importDefault(require("pouchdb"));
 const dayjs_1 = __importDefault(require("dayjs"));
 const StudentService_1 = __importDefault(require("./StudentService"));
+const EventService_1 = __importDefault(require("./EventService"));
 pouchdb_1.default.plugin(require('pouchdb-find'));
 class LectureService {
     database;
@@ -68,6 +69,12 @@ class LectureService {
                     }
                 },
             });
+            const eventService = new EventService_1.default();
+            const events = await eventService.findAllEvents();
+            for (const event of events.docs) {
+                console.log("--------------------------------------------------->");
+                await eventService.createLectureFromEvent(event);
+            }
             return this.sortLecturesByDate(lectures);
         }
         catch (error) {
@@ -150,6 +157,26 @@ class LectureService {
                 lecture.forEach(item => lectures.push({ lecture: item, student }));
             }
             return lectures.sort((l1, l2) => (0, dayjs_1.default)(l2.lecture.lesson.startAt).unix() - (0, dayjs_1.default)(l1.lecture.lesson.startAt).unix());
+        }
+        catch (error) {
+            throw new Error("Erro ao buscar aulas");
+        }
+    }
+    async findLecturesByEventId(id) {
+        try {
+            if (id) {
+                const lectures = await this.database.find({
+                    selector: {
+                        event: {
+                            _id: id
+                        }
+                    }
+                });
+                return this.sortLecturesByDate(lectures);
+            }
+            else {
+                return [];
+            }
         }
         catch (error) {
             throw new Error("Erro ao buscar aulas");
