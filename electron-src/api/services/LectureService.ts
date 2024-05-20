@@ -2,7 +2,6 @@ import PouchDB from "pouchdb";
 import { Lecture, Student } from "../interfaces";
 import dayjs from "dayjs";
 import StudentService from "./StudentService";
-import EventService from "./EventService";
 PouchDB.plugin(require('pouchdb-find'));
 
 class LectureService {
@@ -74,15 +73,6 @@ class LectureService {
                     }
                 },
             });
-
-            const eventService = new EventService();
-            const events = await eventService.findAllEvents();
-
-            for (const event of events.docs) {
-                console.log("--------------------------------------------------->");
-                const l = await eventService.createLectureFromEvent(event);
-                console.log(l);
-            }
 
             return this.sortLecturesByDate(lectures);
         } catch (error: any) {

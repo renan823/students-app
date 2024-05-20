@@ -43,4 +43,8 @@ electron_1.ipcMain.on("find-students-in-debt", studentController.findStudentsInD
 electron_1.ipcMain.on("count-students", studentController.countStudents);
 const lectureController = new LectureController_1.default();
 electron_1.ipcMain.on("add-lecture", lectureController.addLecture);
+electron_1.ipcMain.on("update-lecture", lectureController.updateLecture);
 electron_1.ipcMain.on("find-lectures-by-week", lectureController.findLecturesByWeek);
+electron_1.ipcMain.on("find-all-lectures", lectureController.findAllLectures);
+electron_1.ipcMain.on("find-lectures-by-day", lectureController.findLecturesByDay);
+electron_1.ipcMain.on("find-lectures-by-student-name", lectureController.findLecturesByStudentName);

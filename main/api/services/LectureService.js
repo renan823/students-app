@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const pouchdb_1 = __importDefault(require("pouchdb"));
 const dayjs_1 = __importDefault(require("dayjs"));
 const StudentService_1 = __importDefault(require("./StudentService"));
-const EventService_1 = __importDefault(require("./EventService"));
 pouchdb_1.default.plugin(require('pouchdb-find'));
 class LectureService {
     database;
@@ -69,13 +68,6 @@ class LectureService {
                     }
                 },
             });
-            const eventService = new EventService_1.default();
-            const events = await eventService.findAllEvents();
-            for (const event of events.docs) {
-                console.log("--------------------------------------------------->");
-                const l = await eventService.createLectureFromEvent(event);
-                console.log(l);
-            }
             return this.sortLecturesByDate(lectures);
         }
         catch (error) {

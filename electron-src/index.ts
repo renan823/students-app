@@ -50,4 +50,8 @@ ipcMain.on("count-students", studentController.countStudents);
 const lectureController = new LectureController();
 
 ipcMain.on("add-lecture", lectureController.addLecture);
+ipcMain.on("update-lecture", lectureController.updateLecture);
 ipcMain.on("find-lectures-by-week", lectureController.findLecturesByWeek);
+ipcMain.on("find-all-lectures", lectureController.findAllLectures);
+ipcMain.on("find-lectures-by-day", lectureController.findLecturesByDay);
+ipcMain.on("find-lectures-by-student-name", lectureController.findLecturesByStudentName);

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const LectureService_1 = __importDefault(require("../services/LectureService"));
 const StudentService_1 = __importDefault(require("../services/StudentService"));
 const EventService_1 = __importDefault(require("../services/EventService"));
+const dayjs_1 = __importDefault(require("dayjs"));
 class LectureController {
     constructor() { }
     ;
@@ -52,6 +53,17 @@ class LectureController {
     async findLecturesByWeek(event, day) {
         try {
             const lectureService = new LectureService_1.default();
+            const eventService = new EventService_1.default();
+            const events = await eventService.findAllEvents();
+            for (const event of events.docs) {
+                const lecture = await eventService.createLectureFromEvent(event);
+                console.log(lecture, (0, dayjs_1.default)().toISOString());
+                if (lecture) {
+                    if ((0, dayjs_1.default)(lecture.lesson.startAt).isBefore((0, dayjs_1.default)()) && (0, dayjs_1.default)(lecture.lesson.startAt).isAfter((0, dayjs_1.default)(lecture.event?.initialDate))) {
+                        await lectureService.addLecture(lecture);
+                    }
+                }
+            }
             const result = await lectureService.findLecturesByWeek(day);
             const lectures = await lectureService.joinWithStudents(result);
             return event.reply("find-lectures-by-week-success", { lectures });
@@ -65,10 +77,10 @@ class LectureController {
             const lectureService = new LectureService_1.default();
             const result = await lectureService.findLecturesByDay(day);
             const lectures = await lectureService.joinWithStudents(result);
-            return event.reply("find-lectures-by-week-success", { lectures });
+            return event.reply("find-lectures-by-day-success", { lectures });
         }
         catch (error) {
-            return event.reply("find-lectures-by-week-error", { message: error.message || "Algo deu errado" });
+            return event.reply("find-lectures-by-day-error", { message: error.message || "Algo deu errado" });
         }
     }
     async findLecturesByMonthsAgo(event, months) {
@@ -76,10 +88,10 @@ class LectureController {
             const lectureService = new LectureService_1.default();
             const result = await lectureService.findLecturesByMonthsAgo(months);
             const lectures = await lectureService.joinWithStudents(result);
-            return event.reply("find-lectures-by-week-success", { lectures });
+            return event.reply("find-lectures-by-months-ago-success", { lectures });
         }
         catch (error) {
-            return event.reply("find-lectures-by-week-error", { message: error.message || "Algo deu errado" });
+            return event.reply("find-lectures-by-months-ago-error", { message: error.message || "Algo deu errado" });
         }
     }
     async findLecturesByStudentName(event, name) {
@@ -88,10 +100,10 @@ class LectureController {
             const studentService = new StudentService_1.default();
             const students = await studentService.findStudentsByName(name);
             const lectures = await lectureService.findLecturesByStudents(students);
-            return event.reply("find-lectures-by-week-success", { lectures });
+            return event.reply("find-lectures-by-student-name-success", { lectures });
         }
         catch (error) {
-            return event.reply("find-lectures-by-week-error", { message: error.message || "Algo deu errado" });
+            return event.reply("find-lectures-by-student-name-error", { message: error.message || "Algo deu errado" });
         }
     }
 }
