@@ -21,7 +21,8 @@ class LectureController {
 
             return event.reply("add-lecture-success", { lecture: createdLecture });
         } catch (error: any) {
-            return event.reply("add-student-error", { message: error.message || "Algo deu errado" });
+            console.log(error)
+            return event.reply("add-lecture-error", { message: error.message || "Algo deu errado" });
         }
     }
 

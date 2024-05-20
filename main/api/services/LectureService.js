@@ -73,7 +73,8 @@ class LectureService {
             const events = await eventService.findAllEvents();
             for (const event of events.docs) {
                 console.log("--------------------------------------------------->");
-                await eventService.createLectureFromEvent(event);
+                const l = await eventService.createLectureFromEvent(event);
+                console.log(l);
             }
             return this.sortLecturesByDate(lectures);
         }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Layout } from "../components/Layout";
-import StudentModal from "../components/Student/StudentModal";
+import StudentModal from "../components/students/StudentModal";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { sendEvent } from "../utils/event";
-import StudentCard from "../components/Student/StudentCard/StudentCard";
+import StudentCard from "../components/students/StudentCard/StudentCard";
 import Pagination from "../components/Pagination";
 import store from "../utils/store";
 

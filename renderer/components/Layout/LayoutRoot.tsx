@@ -13,7 +13,7 @@ export function LayoutRoot ({ children }: LayoutRootProps) {
                 <Navigation.Root>
                     <Navigation.Item target="/" icon={Calendar}/>
                     <Navigation.Item target="/students" icon={Users}/>
-                    <Navigation.Item target="/lessons" icon={BookOpen}/>
+                    <Navigation.Item target="/lectures" icon={BookOpen}/>
                     <Navigation.Item target="/dashboard" icon={CircleDollarSign}/>
                 </Navigation.Root>
             </div>
