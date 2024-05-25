@@ -1,5 +1,5 @@
 import PouchDB from "pouchdb";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { Event, Lecture } from "../interfaces";
 import LectureService from "./LectureService";
 import { v4 as uuidv4 } from "uuid";
@@ -70,64 +70,60 @@ class EventService {
         }
     }
 
-    async findNextDate (event: Event) {
+
+    findNextDates (event: Event, weekStart: Dayjs) {
         try {
-            const lectureService = new LectureService();
-
-            const lastLecture = (await lectureService.findLecturesByEventId(event._id))[0];
-
-            const lectureDay = dayjs(lastLecture.lesson.startAt).day();
-
-            if (lastLecture.event?.repeat.slice(lectureDay == 6 ? lectureDay : lectureDay + 1).includes(true)) {
-                //only accepts days between 0-6
-                //find the first repeat after the date
-                return {
-                    newDay: dayjs(lastLecture.lesson.startAt).add(lastLecture.event?.repeat.slice(lectureDay == 6 ? lectureDay : lectureDay + 1).indexOf(true)+1, "d"),
-                    lastLecture
+            const days = event.repeat.map((repeat: boolean, index: number) => {
+                if (repeat) {
+                    return dayjs(weekStart).add(index, "d");
                 }
-                
-            } else if (lastLecture.event?.repeat.slice(0, lectureDay).includes(true)) {
-                //find the first repeat before the date
-                return {
-                    newDay: dayjs(lastLecture.lesson.startAt).add(1, "w").add(lastLecture.event?.repeat.slice(0, lectureDay).indexOf(true)+1, "d"),
-                    lastLecture
-                }
-            } else {
-                //the new date is one week after the last date
-                return { newDay: dayjs(lastLecture.lesson.startAt).add(1, "w"), lastLecture };
-            }
+            })
+
+            return days;
         } catch (error: any) {
             throw new Error("Erro ao buscar evento");
         }
     }
 
-    async createLectureFromEvent (event: Event) {
+    async createLecturesFromEvent (event: Event, date: string) {
         try {
-            const { newDay, lastLecture } = await this.findNextDate(event);
+            const lectureService = new LectureService();
+            const lastLecture = (await lectureService.findLecturesByEventId(event._id))[0];
 
-            const duration = dayjs(lastLecture.lesson.endAt).diff(dayjs(lastLecture.lesson.startAt), "h");
+            const weekStart = dayjs(date).startOf("week");
 
-            if (lastLecture.event) {
-                const lecture: Lecture = { 
-                    _id: uuidv4(),
-                    payed: lastLecture.payed,
-                    presence: lastLecture.presence,
-                    studentId: lastLecture.studentId,
-                    event: {
-                        ...lastLecture.event,
-                    },
-                    lesson: { 
-                        startAt: newDay.toISOString(), 
-                        endAt: dayjs(newDay).add(duration, "h").toISOString(),
-                        value: lastLecture.lesson.value 
-                    },
-                    fromEvent: true
+            const newDays = this.findNextDates(event, weekStart);
+
+            const lectures: (Lecture | null)[] = newDays.map(day => {
+                if (day && lastLecture.event) {
+
+                    const duration = dayjs(lastLecture.lesson.endAt).diff(dayjs(lastLecture.lesson.startAt), "h");
+
+                    const startAt = dayjs(day).set("h", dayjs(lastLecture.lesson.startAt).hour()).set("minute", dayjs(lastLecture.lesson.startAt).minute());
+
+                    return {
+                        _id: uuidv4(),
+                        payed: lastLecture.payed,
+                        presence: lastLecture.presence,
+                        studentId: lastLecture.studentId,
+                        event: {
+                            ...lastLecture.event,
+                        },
+                        lesson: { 
+                            startAt: startAt.toISOString(),
+                            endAt: dayjs(startAt).add(duration, "h").toISOString(),
+                            value: lastLecture.lesson.value 
+                        },
+                        fromEvent: true
+                    }
                 }
 
-                return lecture;
-            }
-        } catch (error: any) {
+                return null;
+            })
 
+            return lectures;
+        } catch (error: any) {
+            throw new Error("Erro ao buscar evento");
         }
     }
 }

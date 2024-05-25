@@ -3,15 +3,18 @@ import { sendEvent } from "../../utils/event";
 
 export async function getEvents (week: Dayjs) {
     try {
-        const { lectures }: any = await sendEvent("find-lectures-by-week", week.toISOString());
+        const data: any = await sendEvent("find-lectures-by-week", week.toISOString());
 
-        const events = lectures.map((lecture: any) => {
-
+        const events = data.lectures.map(({ lecture, student }) => {
             const event = {
                 start: lecture.lesson.startAt, 
-                end: dayjs(lecture.lesson.startAt).add(parseInt(lecture.lesson.duration), "hour").toISOString(),
-                title: lecture.student.name,
+                end: lecture.lesson.endAt,
+                title: student.name,
                 color: lecture.payed ? "#593FD8" : "#D81CB3"
+            }
+
+            if (dayjs().endOf("week").isBefore(dayjs(event.start))) {
+                event.color = "#593FD8";
             }
 
             return event;

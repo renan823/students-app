@@ -57,7 +57,7 @@ export default function Lectures () {
         async function fetch () {
             try {
                 const { lectures }: any = await sendEvent("find-all-lectures", currentPage, perPage);
-                console.log(lectures)
+                console.log("aqui oh", lectures)
                 setLectures(lectures);
                 setDebt(10);
             } catch (error) {

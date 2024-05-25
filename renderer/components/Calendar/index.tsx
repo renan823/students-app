@@ -13,6 +13,7 @@ export default function Calendar () {
         const week = dayjs(args.start).startOf("day");
         const events: any = await getEvents(week);
         setEvents(events);
+        console.log("aqui oh", events)
     }
 
     useEffect(() => {
@@ -20,6 +21,7 @@ export default function Calendar () {
             try {
                 setLoading(true);
                 const events: any[] = await getEvents(dayjs().startOf("day"));
+                console.log(events)
                 setEvents(events);
             } catch (error) {
                 setEvents([]);

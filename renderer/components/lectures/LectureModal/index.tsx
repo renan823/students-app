@@ -163,14 +163,14 @@ export default function LectureModal ({ isOpen, setOpen, lecture }) {
                     <Field name="startAt" control={control} rules={{ required: true }} error={ errors.startAt } label="Início da aula" type="datetime-local"/>
                     <Field name="duration" control={control} rules={{ required: true }} error={ errors.duration } label="Duração da aula" type="number" step={1} min={0}/>
                     <div className="w-full p-2">
-                        <h3 className="font-bold text-lg">Repetir:</h3>
+                        <h3 className="font-bold text-lg">Repetir: { lecture.fromEvent ? "Esta aula veio de um evento! Altere o evento para mudar os dias aqui listados" : ""}</h3>
                         <div className="flex p-2 gap-3 items-center justify-center">
                             {
                                 days.map((day, index) => {
                                     return (
                                         <div key={index} className="size-12">
                                             <div className="w-12 flex justify-center">
-                                                <input className="size-6" type="checkbox" defaultChecked={events[index]} name={day} id={day} onChange={(event) => handleWeekEvent(event)}/>
+                                                <input className="size-6" type="checkbox" disabled={lecture.fromEvent}  defaultChecked={events[index]} name={day} id={day} onChange={(event) => handleWeekEvent(event)}/>
                                             </div>
                                             <h2 className="text-center font-bold">{day}</h2>
                                         </div>

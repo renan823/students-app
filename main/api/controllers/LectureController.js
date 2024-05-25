@@ -21,7 +21,6 @@ class LectureController {
             return event.reply("add-lecture-success", { lecture: createdLecture });
         }
         catch (error) {
-            console.log(error);
             return event.reply("add-lecture-error", { message: error.message || "Algo deu errado" });
         }
     }
@@ -55,18 +54,29 @@ class LectureController {
             const lectureService = new LectureService_1.default();
             const eventService = new EventService_1.default();
             const events = await eventService.findAllEvents();
+            const eventsToShow = [];
             for (const event of events.docs) {
-                const lecture = await eventService.createLectureFromEvent(event);
-                console.log(lecture, (0, dayjs_1.default)().toISOString());
-                if (lecture) {
-                    if ((0, dayjs_1.default)(lecture.lesson.startAt).isBefore((0, dayjs_1.default)()) && (0, dayjs_1.default)(lecture.lesson.startAt).isAfter((0, dayjs_1.default)(lecture.event?.initialDate))) {
-                        await lectureService.addLecture(lecture);
+                const lectures = await eventService.createLecturesFromEvent(event, day);
+                for (const lecture of lectures) {
+                    if (lecture) {
+                        console.log(lecture);
+                        if ((0, dayjs_1.default)(lecture.lesson.startAt).isAfter((0, dayjs_1.default)(lecture.event?.initialDate))) {
+                            if ((0, dayjs_1.default)(lecture.lesson.startAt).isBefore((0, dayjs_1.default)())) {
+                                console.log("aqui");
+                                await lectureService.addLecture(lecture);
+                            }
+                            else {
+                                const studentService = new StudentService_1.default();
+                                const student = await studentService.findStudentById(lecture.studentId);
+                                eventsToShow.push({ lecture, student });
+                            }
+                        }
                     }
                 }
             }
             const result = await lectureService.findLecturesByWeek(day);
             const lectures = await lectureService.joinWithStudents(result);
-            return event.reply("find-lectures-by-week-success", { lectures });
+            return event.reply("find-lectures-by-week-success", { lectures: [...lectures, ...eventsToShow] });
         }
         catch (error) {
             return event.reply("find-lectures-by-week-error", { message: error.message || "Algo deu errado" });

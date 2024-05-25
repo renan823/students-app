@@ -18,8 +18,21 @@ class LectureService {
     }
     async addLecture(lecture) {
         try {
-            const result = await this.database.put(lecture);
-            return result;
+            const exists = await this.database.find({
+                selector: {
+                    studentId: lecture.studentId,
+                    lesson: {
+                        startAt: lecture.lesson.startAt
+                    },
+                    event: {
+                        _id: lecture.event?._id
+                    }
+                }
+            });
+            if (exists.docs.length === 0) {
+                const result = await this.database.put(lecture);
+                return result;
+            }
         }
         catch (error) {
             throw new Error("Erro ao cadastrar aula");

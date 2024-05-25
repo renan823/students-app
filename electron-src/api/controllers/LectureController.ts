@@ -1,6 +1,6 @@
 import { IpcMainEvent } from "electron";
 import LectureService from "../services/LectureService";
-import { Lecture } from "../interfaces";
+import { Lecture, Student } from "../interfaces";
 import StudentService from "../services/StudentService";
 import EventService from "../services/EventService";
 import dayjs from "dayjs";
@@ -22,7 +22,6 @@ class LectureController {
 
             return event.reply("add-lecture-success", { lecture: createdLecture });
         } catch (error: any) {
-            console.log(error)
             return event.reply("add-lecture-error", { message: error.message || "Algo deu errado" });
         }
     }
@@ -65,14 +64,25 @@ class LectureController {
 
             const events = await eventService.findAllEvents();
 
-            for (const event of events.docs) {
-                const lecture = await eventService.createLectureFromEvent(event);
+            const eventsToShow: { student: Student, lecture: Lecture }[] = [];
 
-                console.log(lecture, dayjs().toISOString())
-                
-                if (lecture) {
-                    if (dayjs(lecture.lesson.startAt).isBefore(dayjs()) && dayjs(lecture.lesson.startAt).isAfter(dayjs(lecture.event?.initialDate))) {
-                        await lectureService.addLecture(lecture);
+            for (const event of events.docs) {
+                const lectures = await eventService.createLecturesFromEvent(event, day);
+
+                for (const lecture of lectures) {
+                    if (lecture) {
+                        console.log(lecture)
+                        if (dayjs(lecture.lesson.startAt).isAfter(dayjs(lecture.event?.initialDate))) {
+                            if (dayjs(lecture.lesson.startAt).isBefore(dayjs())) {
+                                console.log("aqui")
+                                await lectureService.addLecture(lecture);
+                            } else {
+                                const studentService = new StudentService();
+                                const student = await studentService.findStudentById(lecture.studentId);
+    
+                                eventsToShow.push({ lecture, student });
+                            }
+                        }
                     }
                 }
             }
@@ -81,7 +91,7 @@ class LectureController {
 
             const lectures = await lectureService.joinWithStudents(result);
 
-            return event.reply("find-lectures-by-week-success", { lectures });
+            return event.reply("find-lectures-by-week-success", { lectures: [...lectures, ...eventsToShow] });
         } catch (error: any) {
             return event.reply("find-lectures-by-week-error", { message: error.message || "Algo deu errado" });
         }
