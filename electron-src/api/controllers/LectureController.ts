@@ -71,15 +71,13 @@ class LectureController {
 
                 for (const lecture of lectures) {
                     if (lecture) {
-                        console.log(lecture)
                         if (dayjs(lecture.lesson.startAt).isAfter(dayjs(lecture.event?.initialDate))) {
                             if (dayjs(lecture.lesson.startAt).isBefore(dayjs())) {
-                                console.log("aqui")
                                 await lectureService.addLecture(lecture);
                             } else {
                                 const studentService = new StudentService();
                                 const student = await studentService.findStudentById(lecture.studentId);
-    
+
                                 eventsToShow.push({ lecture, student });
                             }
                         }
@@ -137,6 +135,18 @@ class LectureController {
             return event.reply("find-lectures-by-student-name-success", { lectures });
         } catch (error: any) {
             return event.reply("find-lectures-by-student-name-error", { message: error.message || "Algo deu errado" });
+        }
+    }
+
+    async countLectures (event: IpcMainEvent) {
+        try {
+            const lectureService = new LectureService();
+
+            const lectures = await lectureService.countLectures();
+
+            return event.reply("count-lectures-success", { total: lectures });
+        } catch (error: any) {
+            return event.reply("count-lectures-error", { message: error.message || "Algo deu errado" });
         }
     }
 }

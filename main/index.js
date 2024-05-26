@@ -48,3 +48,5 @@ electron_1.ipcMain.on("find-lectures-by-week", lectureController.findLecturesByW
 electron_1.ipcMain.on("find-all-lectures", lectureController.findAllLectures);
 electron_1.ipcMain.on("find-lectures-by-day", lectureController.findLecturesByDay);
 electron_1.ipcMain.on("find-lectures-by-student-name", lectureController.findLecturesByStudentName);
+electron_1.ipcMain.on("count-lectures", lectureController.countLectures);
+electron_1.ipcMain.on("find-lectures-by-months-ago", lectureController.findLecturesByMonthsAgo);

@@ -2,7 +2,8 @@ declare global {
     interface Window {
         main: {
             send: (channel: string, ...args) => void,
-            receive: (channeL: string, Function) => void
+            receive: (channel: string, Function) => void,
+            stop: (channel: string) => void
         }
     }
 }
@@ -10,6 +11,7 @@ declare global {
 export async function sendEvent (channel: string, ...args) {
     return new Promise((resolve, reject) => {
         window.main.receive(`${channel}-success`, event => {
+            window.main.stop(channel);
             resolve(event);
         });
 
@@ -21,7 +23,8 @@ export async function sendEvent (channel: string, ...args) {
 
         window.main.receive(`${channel}-error`, event => {
             clearTimeout(timeout);
-            reject(event)
+            window.main.stop(channel);
+            reject(event);
         })
     })
 }

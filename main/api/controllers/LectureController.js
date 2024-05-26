@@ -59,10 +59,8 @@ class LectureController {
                 const lectures = await eventService.createLecturesFromEvent(event, day);
                 for (const lecture of lectures) {
                     if (lecture) {
-                        console.log(lecture);
                         if ((0, dayjs_1.default)(lecture.lesson.startAt).isAfter((0, dayjs_1.default)(lecture.event?.initialDate))) {
                             if ((0, dayjs_1.default)(lecture.lesson.startAt).isBefore((0, dayjs_1.default)())) {
-                                console.log("aqui");
                                 await lectureService.addLecture(lecture);
                             }
                             else {
@@ -114,6 +112,16 @@ class LectureController {
         }
         catch (error) {
             return event.reply("find-lectures-by-student-name-error", { message: error.message || "Algo deu errado" });
+        }
+    }
+    async countLectures(event) {
+        try {
+            const lectureService = new LectureService_1.default();
+            const lectures = await lectureService.countLectures();
+            return event.reply("count-lectures-success", { total: lectures });
+        }
+        catch (error) {
+            return event.reply("count-lectures-error", { message: error.message || "Algo deu errado" });
         }
     }
 }

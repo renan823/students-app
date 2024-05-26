@@ -35,7 +35,7 @@ export function LectureCardPayed ({ payed }) {
 }
 
 export default function LectureCard ({ data }) {
-    const setLecture = store().setStudents;
+    const setLecture = store().setLectures;
 
     const [isOpen, setOpen] = useState(false);
 
@@ -45,7 +45,7 @@ export default function LectureCard ({ data }) {
         try {
             let result = await setPayed(lecture);
             if (result) {
-                setLecture(true)
+                setLecture(true);
             }
         } catch (error) {
             toast.error("Erro ao atualizar");
@@ -56,7 +56,7 @@ export default function LectureCard ({ data }) {
         try {
             let result = await setPresence(lecture);
             if (result) {
-                setLecture(true)
+                setLecture(true);
             }
         } catch (error) {
             toast.error("Erro ao atualizar");
@@ -84,7 +84,7 @@ export default function LectureCard ({ data }) {
                     </div>
                 </div>
             </div>
-            <LectureModal isOpen={isOpen} setOpen={setOpen} lecture={lecture}/>
+            <LectureModal isOpen={isOpen} setOpen={setOpen} lecture={{...lecture, student}}/>
         </div>
     )
 }

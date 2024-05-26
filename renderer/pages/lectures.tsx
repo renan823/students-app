@@ -45,7 +45,6 @@ export default function Lectures () {
                 setTotal(total);
                 setMax(Math.ceil(total/perPage));
             } catch (error) {
-                console.log(error);
                 setTotal(10);
             }
         }
@@ -57,9 +56,11 @@ export default function Lectures () {
         async function fetch () {
             try {
                 const { lectures }: any = await sendEvent("find-all-lectures", currentPage, perPage);
-                console.log("aqui oh", lectures)
                 setLectures(lectures);
-                setDebt(10);
+
+                let count = 0;
+                lectures.forEach((data: any) => data.lecture.payed ? count+=0 : count+=1);
+                setDebt(count);
             } catch (error) {
                 toast.error("Algo deu errado");
             } finally {

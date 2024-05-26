@@ -27,7 +27,6 @@ export async function addLecture (lesson, student, events: boolean[]) {
         await sendEvent("add-lecture", lecture);
         return true;
     } catch (error) {
-        console.log(error)
         return false;
     }
 }

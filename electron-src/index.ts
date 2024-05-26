@@ -55,3 +55,5 @@ ipcMain.on("find-lectures-by-week", lectureController.findLecturesByWeek);
 ipcMain.on("find-all-lectures", lectureController.findAllLectures);
 ipcMain.on("find-lectures-by-day", lectureController.findLecturesByDay);
 ipcMain.on("find-lectures-by-student-name", lectureController.findLecturesByStudentName);
+ipcMain.on("count-lectures", lectureController.countLectures);
+ipcMain.on("find-lectures-by-months-ago", lectureController.findLecturesByMonthsAgo)
