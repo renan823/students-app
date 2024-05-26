@@ -7,7 +7,7 @@ module.exports = {
           primaryBlue: "#593FD8",
           darkBlue: "#00007F",
           lightGray: "#E7EFF1",
-          lightGreen: "#55FBDC",
+          lightGreen: "#00946A",
           lightRed: "#D81CB3"
         },
         maxHeight: {

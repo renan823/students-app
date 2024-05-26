@@ -10,10 +10,10 @@ export async function getEvents (week: Dayjs) {
                 start: lecture.lesson.startAt, 
                 end: lecture.lesson.endAt,
                 title: student.name,
-                color: lecture.payed ? "#593FD8" : "#D81CB3"
+                color: lecture.payed ? "#00946A" : "#D81CB3"
             }
 
-            if (dayjs().endOf("week").isBefore(dayjs(event.start))) {
+            if (dayjs().isBefore(dayjs(event.start))) {
                 event.color = "#593FD8";
             }
 
