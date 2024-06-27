@@ -25,9 +25,14 @@ class EventService {
 
     async updateEvent (event: Event) {
         try {
-            const eventExists = await this.findEventById(event._id);
+            const results = await this.database.find({
+                selector: {
+                    _id: event._id
+                }
+            })
 
-            if (eventExists) {
+            if (results.docs.length !== 0) {
+                const eventExists = results.docs[0];
                 if (event.repeat.includes(true)) {
                     this.database.put({
                         _rev: eventExists._rev,
@@ -37,11 +42,13 @@ class EventService {
                     //remove event if repeat is false 
                     await this.database.remove({ 
                         _id: eventExists._id,
-                        _rev: eventExists._id
+                        _rev: eventExists._rev
                     })
                 }
+            } else {
+                this.addEvent(event);
             }
-        } catch {
+        } catch (error: any) {
             throw new Error("Erro ao criar evento");
         }
     }

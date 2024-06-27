@@ -27,6 +27,10 @@ export async function setPayed (payload) {
 
 export async function updateLecture (lecture, lesson, events) {
 
+    if (lecture.student) {
+        delete lecture.student;
+    }
+
     lesson.startAt = new Date(lesson.startAt).toISOString();
     lesson.endAt = dayjs(lesson.startAt).add(parseInt(`${lesson.duration}`), "hours").toISOString();
     lesson.value = parseFloat(`${lesson.value}`);

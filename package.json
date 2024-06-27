@@ -1,12 +1,19 @@
 {
   "private": true,
+  "name": "students-app",
+  "version": "1.0.0",
   "main": "main/index.js",
   "productName": "Gerenciador de Aulas",
+  "authors": [
+    "Arthur de Vicente Mascaro",
+    "Renan Trofino Silva"
+  ],
   "scripts": {
     "clean": "rimraf dist main renderer/out renderer/.next",
     "dev": "npm run build-electron && electron .",
     "build-renderer": "next build renderer",
     "build-electron": "tsc -p electron-src",
+    "build-win": "npm run build && electron-builder -w --dir",
     "build": "npm run build-renderer && npm run build-electron",
     "pack-app": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
@@ -38,17 +45,11 @@
     "@types/react-dom": "^16.9.24",
     "@types/uuid": "^9.0.8",
     "electron": "^27.1.2",
-    "electron-builder": "^24.9.1",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2",
     "next": "latest",
     "rimraf": "^3.0.2",
     "tailwindcss": "^3.4.3",
     "typescript": "^4.9.5"
-  },
-  "build": {
-    "asar": true,
-    "files": [
-      "main",
-      "renderer/out"
-    ]
   }
 }

@@ -48,6 +48,31 @@ class LectureService {
                 ...lecture
             });
 
+            if (!lecture.fromEvent && lecture.event) {
+                const lectures = await this.database.find({
+                    selector: {
+                        event: {
+                            _id: lecture.event._id
+                        }
+                    }
+                });
+
+                for (const lec of lectures.docs) {
+                    if (lec._id !== lecture._id) {
+                        await this.database.put<Lecture>({
+                            _id: lec._id,
+                            _rev: lec._rev,
+                            lesson: lec.lesson,
+                            studentId: lec.studentId,
+                            event: lecture.event,
+                            fromEvent: lec.fromEvent,
+                            payed: lec.payed,
+                            presence: lec.presence
+                        })
+                    }
+                }
+            }
+
             return result;
         } catch (error: any) {
             throw new Error("Erro ao atualizar dados da aula");

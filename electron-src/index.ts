@@ -30,7 +30,7 @@ app.on("ready", async () => {
 		});
 
 	mainWindow.maximize();
-	//mainWindow.removeMenu();
+	mainWindow.removeMenu();
   	mainWindow.loadURL(url);
 });
 
